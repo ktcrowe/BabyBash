@@ -14,8 +14,6 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from joblib import dump, load
 
-#test
-
 # Define constant values for audio processing
 SAMPLE_RATE = 44100  # Sample rate in Hz for audio processing
 BLOCK_SIZE = 882  # Block size for the audio stream buffer (882 creates 20ms blocks)
