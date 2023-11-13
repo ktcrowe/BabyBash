@@ -24,7 +24,7 @@ HOP_LENGTH = N_FFT // 4  # Hop length for the FFT, typically 1/4th of the FFT wi
 
 # Define paths to audio files
 CRYING_PATH = 'data/crying'  # audio files of crying babies
-NOISE_PATH = 'data/noise'  # audio files of various other noises (not babies crying)
+NOISE_PATH = 'data/noise'  # audio files of various other noise (not babies crying)
 
 prediction_text = ''  # the text to be displayed on the GUI to indicate whether a baby is detected
 
@@ -148,7 +148,7 @@ if __name__ == '__main__':
     # # COMMENT OUT EVERYTHING FROM HERE DOWN TO INPUT STREAM WHEN NOT RETRAINING
     # # Prepare training data
     # crying_features, crying_labels = load_files(CRYING_PATH, 1)  # Load baby crying sounds & label them 1
-    # noise_features, noise_labels = load_files(NOISE_PATH, 0)  # Load other noises & label them 0
+    # noise_features, noise_labels = load_files(NOISE_PATH, 0)  # Load other noise & label them 0
     # # create a 1:1 ration of clean to dirty audio files
     # noise_features, noise_labels = noise_features[:len(crying_features)], noise_labels[:len(crying_labels)]
     # # print(len(crying_features), len(noise_features))  # DEBUG
