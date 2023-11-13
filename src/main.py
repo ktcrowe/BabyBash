@@ -8,23 +8,23 @@ import torch.nn as nn  # Neural network modules
 import torch.nn.functional as F  # Neural network functions
 import torch.optim as optim  # Optimization functions
 import matplotlib.pyplot as plt  # For plotting data
-from matplotlib.animation import FuncAnimation  # For creation animations on the plot
+from matplotlib.animation import FuncAnimation  # For animating the plot
 from torch.utils.data import DataLoader, TensorDataset  # For handling datasets
 from sklearn.model_selection import train_test_split  # For splitting datasets
-from sklearn.preprocessing import StandardScaler  # For feature scaling (normalization)
+from sklearn.preprocessing import StandardScaler  # For feature scaling (MFCC normalization)
 from joblib import dump, load  # For saving and loading objects (the scaler in this case)
 
 # Define constant values for audio processing
 SAMPLE_RATE = 44100  # Sample rate in Hz for audio processing
 BLOCK_SIZE = 882  # Block size for the audio stream buffer (882 creates 20ms blocks)
 NUM_MFCC_COEFFS = 26  # Number of Mel-frequency cepstral coefficients (MFCCs) to compute
-MFCC_RANGE = 10  # Range of values for the y-axis on the plot (initially was 275, but changed to 2 to reflect standardized MFCCs)
+MFCC_RANGE = 10  # Range of values for the y-axis on the plot (initially was 275, but reduced to reflect normalized MFCCs)
 N_FFT = BLOCK_SIZE  # Fast Fourier Transform (FFT) window size set to block size
 HOP_LENGTH = N_FFT // 4  # Hop length for the FFT, typically 1/4th of the FFT window size
 
 # Define paths
 CRYING_PATH = 'data/crying'  # audio files of crying babies
-NOISE_PATH = 'data/noise'  # audio files of various other noise (not babies crying)
+NOISE_PATH = 'data/noise'  # audio files of various other noises (not babies crying)
 MODELS_PATH = 'models'  # folder where AI models are saved
 
 RETRAIN = False  # make this true when you wish to generate a new model
@@ -46,9 +46,11 @@ class AudioClassifier(nn.Module):
 
     # Forward pass through the network
     def forward(self, x):
-        # This applies the Rectified Linear Unit function (ReLU)
-        #   f(x) = max(0, x)
-        #   In other words, any negative values from the output of a given layer are changed to 0.
+        """
+        This applies the Rectified Linear Unit function (ReLU)
+            f(x) = max(0, x)
+        In other words, any negative values from the output of a given layer are changed to 0.
+        """
         x = F.relu(self.fc1(x))  # apply ReLU to layer 1 output
         x = F.relu(self.fc2(x))  # apply ReLU to layer 2 output
         x = self.fc3(x)  # output layer
@@ -57,8 +59,8 @@ class AudioClassifier(nn.Module):
 
 # Load and label the files for use in training the network
 def load_files(folder, label):
-    features = []
-    labels = []
+    features = []  # holds MFCC values for each file
+    labels = []  # contains the label for each audio file (1 for baby crying, 0 for no baby)
     for filename in os.listdir(folder):
         if filename.endswith('.wav'):
             path = os.path.join(folder, filename)
@@ -70,7 +72,7 @@ def load_files(folder, label):
     return features, labels
 
 
-# Define a function to compute Mel-frequency cepstral coefficients (MFCCs) from an audio buffer
+# Compute Mel-frequency cepstral coefficients (MFCCs) from an audio buffer
 def compute_mfcc(indata):
     # Compute the MFCCs for the input data, transpose it, and take the mean across time
     mfccs = librosa.feature.mfcc(y=indata[:, 0], sr=SAMPLE_RATE,
@@ -79,7 +81,7 @@ def compute_mfcc(indata):
     return np.mean(mfccs, axis=0)
 
 
-# Define a function to update the plot with new data
+# Update the plot with new data
 def update_plot(frame):
     """
     This function gets called by the animation framework with a new frame
@@ -95,7 +97,7 @@ def update_plot(frame):
     return line, text_element
 
 
-# Define a callback function that will be called by the audio stream when new data is available
+# Function called by the audio stream when new data is available
 def audio_callback(indata, frames, time, status):
     if status:
         print(status)
@@ -138,29 +140,24 @@ if __name__ == '__main__':
     plt.style.use('fast')  # Set a fast plotting style for real-time updates
     fig, ax = plt.subplots()  # Initialize the plot figure and axis
     x_axis = np.arange(NUM_MFCC_COEFFS)  # Generate x-axis values corresponding to the MFCC coefficients
-    line, = ax.plot(x_axis,
-                    np.zeros(NUM_MFCC_COEFFS))  # Create an initial line object with x-axis and y-axis data for the plot
+    line, = ax.plot(x_axis, np.zeros(NUM_MFCC_COEFFS))  # Create an initial line object with x-axis and y-axis data for the plot
 
     # Set the y-axis and x-axis limits for the plot
     ax.set_ylim(-MFCC_RANGE, MFCC_RANGE)
-    ax.set_xlim(0, NUM_MFCC_COEFFS - 1)
+    ax.set_xlim(0, NUM_MFCC_COEFFS-1)
 
     # Label the x-axis and y-axis of the plot
     ax.set_xlabel('MFCC Coefficients')
     ax.set_ylabel('Amplitude')
 
-    # Set the title for the plot
-    ax.set_title('Real-time MFCC')
+    ax.set_title('Real-time MFCC')  # Set the title for the plot
 
-    # Initialize a text element on the plot to display when a baby is crying
+    # Initialize the text element on the plot to display when a baby is crying
     text_element = ax.text(0.5, 0.1, '', horizontalalignment='center', verticalalignment='center',
                            transform=ax.transAxes)
 
-    # Initialize an array to hold the MFCC data, initially filled with zeros
-    mfccs = np.zeros(NUM_MFCC_COEFFS)
-
-    # Initialize the neural network
-    model = AudioClassifier()
+    mfccs = np.zeros(NUM_MFCC_COEFFS)  # Initialize an array to hold the MFCC data, initially filled with zeros
+    model = AudioClassifier()  # Initialize the neural network
 
     if not RETRAIN:  # This runs when using a previously generated model
         model.load_state_dict(torch.load(f'{MODELS_PATH}/model_v{count_files_in_folder(MODELS_PATH)-1}.pth'))  # load an existing model
@@ -171,7 +168,8 @@ if __name__ == '__main__':
         crying_features, crying_labels = load_files(CRYING_PATH, 1)  # Load baby crying sounds & label them 1
         noise_features, noise_labels = load_files(NOISE_PATH, 0)  # Load other noise & label them 0
 
-        # create a 1:1 ration of clean to dirty audio files
+        # create a 1:1 ratio of positive to negative audio files
+        #   (NOTE: We could try shuffling this list before the slice to get different results.)
         noise_features, noise_labels = noise_features[:len(crying_features)], noise_labels[:len(crying_labels)]
         # print(len(crying_features), len(noise_features))  # DEBUG
 
@@ -180,16 +178,16 @@ if __name__ == '__main__':
         labels = np.array(crying_labels + noise_labels)
         # print(len(features), len(labels))  # DEBUG
 
-        # Normalize features
+        # Normalize features (MFCCs) with a scaler
         scaler = StandardScaler()
         features = scaler.fit_transform(features)
         dump(scaler, 'models/scaler.joblib')  # save the scaler
 
         """
         Split the dataset
-        test_size=0.2 creates an 80/20 split between training and testing data
-        random_state=42 is a seed that ensures this split is the same every time
-        (42 is an arbitrary number that is popular amongst nerds)
+            - test_size=0.2 creates an 80/20 split between training and testing data
+            - random_state=42 is a seed that ensures this split is the same every time
+                (42 is an arbitrary number that is popular amongst nerds)
         """
         x_train, x_test, y_train, y_test = train_test_split(features, labels, test_size=0.2, random_state=42)
 
@@ -210,7 +208,7 @@ if __name__ == '__main__':
         optimizer = optim.Adam(model.parameters(), lr=0.001)
 
         # Training loop
-        num_epochs = 10  # the network will be run through 10 times
+        num_epochs = 10  # the network will run through the entire data set 10 times
         for epoch in range(num_epochs):
             for data, labels in train_loader:
                 # Forward pass
@@ -218,14 +216,15 @@ if __name__ == '__main__':
                 loss = criterion(outputs, labels)
 
                 # Backward and optimize AKA backpropagation
-                optimizer.zero_grad()  # clear gradients from the previous iteration (first step of backpropagation)
-                loss.backward()  # compute the gradients for this iteration
+                optimizer.zero_grad()  # clear gradients from the previous epoch (first step of backpropagation)
+                loss.backward()  # compute the gradients for this epoch
                 optimizer.step()  # update the weights and biases of the network using the calculated gradients
 
                 """
-                What is a gradient, you may ask? It is simply the derivative of the loss function.
+                What is a gradient, you may ask? It is the derivative of the loss function.
                 Since the loss function measures how well the model is performing, the gradient is the rate of change
                 in the loss function - or the change in effectiveness of the predictive model.
+                This is essentially how the computer knows that the changes its making are improving the model.
                 """
 
             print(f'Epoch {epoch + 1}/{num_epochs}, Loss: {loss.item()}')
@@ -236,16 +235,16 @@ if __name__ == '__main__':
             correct = 0  # the count of correct guesses made by the network
             total = 0  # the count of total guesses made by the network
             for data, labels in test_loader:
-                outputs = model(data)  # send the current data through the network
-                _, predicted = torch.max(outputs.data, 1)  # get the prediction
+                outputs = model(data)  # send the current test file through the network
+                _, predicted = torch.max(outputs.data, 1)  # get the prediction index (ignore the actual value)
                 total += labels.size(0)  # increment guess count
                 correct += (predicted == labels).sum().item()  # increment correct guess count
+                # (NOTE: The above two lines could be simplified, but they work, so I am afraid to touch them.)
 
         print(f'Accuracy of the model on the test data: {100 * correct / total}%')  # print accuracy after all epochs
-
         torch.save(model.state_dict(), f'{MODELS_PATH}/model_v{count_files_in_folder(MODELS_PATH)}.pth')  # Save the model
 
-    # Use a context manager to open an audio input stream with the specified parameters
+    # Open an audio input stream
     with sd.InputStream(callback=audio_callback, dtype='float32', channels=1,
                         samplerate=SAMPLE_RATE, blocksize=BLOCK_SIZE):
         # Create an animation object that will update the plot in real-time
