@@ -1,0 +1,38 @@
+name: BabyBash CI
+
+# This workflow is triggered on pushes and pull requests to the repository.
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        python-version: ['3.11.5']
+
+    steps:
+    - uses: actions/checkout@v2
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+
+    - name: Setup Conda Environment
+      uses: conda-incubator/setup-miniconda@v2
+      with:
+        activate-environment: myenv
+        environment-file: environment.yml
+        python-version: ${{ matrix.python-version }}
+        auto-activate-base: false
+
+    # Add additional steps for linting, formatting, etc. here if necessary
+
+    - name: Lint with flake8
+      shell: bash -l {0}
+      run: |
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+
+    - name: Run Tests
+      shell: bash -l {0}
+      run: |
+        # Add commands to run your tests here
+        # Example: pytest tests/
