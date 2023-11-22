@@ -1,0 +1,13 @@
+name: babybashenv
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - numpy
+  - librosa
+  - pytorch
+  - matplotlib
+  - scikit-learn
+  - joblib
+  - sounddevice
+  - flake8
