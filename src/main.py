@@ -30,7 +30,7 @@ MODELS_PATH = 'models'  # folder where AI models are saved
 MODEL_TO_USE = 'model_v3.pth'  # the model to use for detecting crying babies
 
 RETRAIN = False  # make this true when you wish to generate a new model
-USE_SPECIFIC_MODEL = True  # make this true when you wish to use a specific model (MODEL_TO_USE)
+USE_SPECIFIC_MODEL = False  # make this true when you wish to use a specific model (MODEL_TO_USE)
 prediction_text = ''  # the text to be displayed on the GUI to indicate whether a baby is detected
 detected_count = 0  # the number of times a baby has been detected (used for comparing models)
 
@@ -173,7 +173,7 @@ def audio_callback(indata, frames, time, status):
     # Display on the GUI when a crying baby is detected
     prediction_text = "Baby crying detected!" if predicted.item() == 1 else ""
     detected_count += 1 if predicted.item() == 1 else 0
-    print(f'Detected {detected_count} times.')  # DEBUG
+    # print(f'Detected {detected_count} times.')  # DEBUG
 
 
 # Count the amount of files in a given directory (used for automatically naming models when loading/saving)
@@ -224,6 +224,8 @@ if __name__ == '__main__':
         scaler = load('models/scaler.joblib')  # load an existing scaler
 
     else:  # This runs when a new model is to be generated
+        print(f'Training new model...')
+
         # Prepare training data
         # crying_features, crying_labels = load_files(CRYING_PATH, 1)  # Load baby crying sounds & label them 1
         # noise_features, noise_labels = load_files(NOISE_PATH, 0)  # Load other noise & label them 0
