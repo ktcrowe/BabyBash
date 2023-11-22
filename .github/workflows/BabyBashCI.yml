@@ -22,28 +22,11 @@ jobs:
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
 
-    - name: Lint with flake8 (bash)
-      if: matrix.os != 'Windows-latest'
-      shell: bash
+    - name: Lint with flake8
       run: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Lint with flake8 (pwsh)
-      if: matrix.os == 'Windows-latest'
-      shell: pwsh
-      run: |
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-    - name: Run Tests (bash)
-      if: matrix.os != 'Windows-latest'
-      shell: bash
-      run: |
-        pytest tests/
-
-    - name: Run Tests (pwsh)
-      if: matrix.os == 'Windows-latest'
-      shell: pwsh
+    - name: Run Tests
       run: |
         pytest tests/
