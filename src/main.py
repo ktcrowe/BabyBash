@@ -27,10 +27,11 @@ AUDIO_FILE_LENGTH = 7  # Length of audio files in seconds (used for normalizing 
 CRYING_PATH = 'data/crying'  # audio files of crying babies
 NOISE_PATH = 'data/noise'  # audio files of various other noises (not babies crying)
 MODELS_PATH = 'models'  # folder where AI models are saved
-MODEL_TO_USE = 'model_v3.pth'  # the model to use for detecting crying babies
+MODEL_TO_USE = 'model_v1.pth'  # the model to use for detecting crying babies
 
 RETRAIN = False  # make this true when you wish to generate a new model
-USE_SPECIFIC_MODEL = False  # make this true when you wish to use a specific model (MODEL_TO_USE)
+USE_SPECIFIC_MODEL = True  # make this true when you wish to use a specific model (MODEL_TO_USE)
+NORMALIZE_AUDIO_LENGTH = False  # make this true when you wish to normalize the length of audio files (AUDIO_FILE_LENGTH)
 prediction_text = ''  # the text to be displayed on the GUI to indicate whether a baby is detected
 detected_count = 0  # the number of times a baby has been detected (used for comparing models)
 
@@ -61,7 +62,7 @@ class AudioClassifier(nn.Module):
         return x
 
 
-def normalize_audio_length(audio_path, target_length=AUDIO_FILE_LENGTH, sample_rate=44100):
+def normalize_audio_length(audio_path):
     """
     Normalize the length of an audio file to a target length in seconds.
 
@@ -75,10 +76,10 @@ def normalize_audio_length(audio_path, target_length=AUDIO_FILE_LENGTH, sample_r
     """
 
     # Load the audio file
-    audio, sr = librosa.load(audio_path, sr=sample_rate)
+    audio, sr = librosa.load(audio_path, sr=SAMPLE_RATE)
 
     # Calculate the target number of samples
-    target_samples = target_length * sample_rate
+    target_samples = AUDIO_FILE_LENGTH * SAMPLE_RATE
 
     # Get the number of samples in the audio file
     current_samples = audio.shape[0]
@@ -95,29 +96,14 @@ def normalize_audio_length(audio_path, target_length=AUDIO_FILE_LENGTH, sample_r
     return padded_audio
 
 
-# # Load and label the files for use in training the network
-# def load_files(folder, label):
-#     features = []  # holds MFCC values for each file
-#     labels = []  # contains the label for each audio file (1 for baby crying, 0 for no baby)
-#     for filename in os.listdir(folder):
-#         if filename.endswith('.wav'):
-#             path = os.path.join(folder, filename)
-#             audio, sr = librosa.load(path, sr=SAMPLE_RATE)  # Load the audio file
-#             mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=NUM_MFCC_COEFFS)  # Extract MFCCs
-#             mfcc = mfcc.mean(axis=1)  # Take the mean of the MFCCs over time
-#             features.append(mfcc)
-#             labels.append(label)
-#     return features, labels
-
-
 # Updated load_files function to normalize audio length
-def load_files(folder, label, target_length=7):
+def load_files(folder, label):
     features = []
     labels = []
     for filename in os.listdir(folder):
         if filename.endswith('.wav'):
             path = os.path.join(folder, filename)
-            audio = normalize_audio_length(path, target_length, SAMPLE_RATE)
+            audio = normalize_audio_length(path) if NORMALIZE_AUDIO_LENGTH else librosa.load(path, sr=SAMPLE_RATE)[0]
             mfcc = librosa.feature.mfcc(y=audio, sr=SAMPLE_RATE, n_mfcc=NUM_MFCC_COEFFS)
             mfcc = mfcc.mean(axis=1)
             features.append(mfcc)
@@ -173,7 +159,7 @@ def audio_callback(indata, frames, time, status):
     # Display on the GUI when a crying baby is detected
     prediction_text = "Baby crying detected!" if predicted.item() == 1 else ""
     detected_count += 1 if predicted.item() == 1 else 0
-    # print(f'Detected {detected_count} times.')  # DEBUG
+    print(f'Detected {detected_count} times.')  # DEBUG
 
 
 # Count the amount of files in a given directory (used for automatically naming models when loading/saving)
@@ -227,10 +213,8 @@ if __name__ == '__main__':
         print(f'Training new model...')
 
         # Prepare training data
-        # crying_features, crying_labels = load_files(CRYING_PATH, 1)  # Load baby crying sounds & label them 1
-        # noise_features, noise_labels = load_files(NOISE_PATH, 0)  # Load other noise & label them 0
-        crying_features, crying_labels = load_files(CRYING_PATH, 1, target_length=AUDIO_FILE_LENGTH)
-        noise_features, noise_labels = load_files(NOISE_PATH, 0, target_length=AUDIO_FILE_LENGTH)
+        crying_features, crying_labels = load_files(CRYING_PATH, 1)  # Load baby crying sounds & label them 1
+        noise_features, noise_labels = load_files(NOISE_PATH, 0)  # Load other noise & label them 0
 
         # create a 1:1 ratio of positive to negative audio files
         #   (NOTE: We could try shuffling this list before the slice to get different results.)
