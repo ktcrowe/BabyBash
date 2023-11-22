@@ -6,6 +6,7 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
     strategy:
       matrix:
         os: [macOS-latest, ubuntu-latest, windows-latest]
@@ -26,13 +27,13 @@ jobs:
     # Add additional steps for linting, formatting, etc. here if necessary
 
     - name: Lint with flake8
-      shell: bash -l {0}
+      shell: bash
       run: |
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Run Tests
-      shell: bash -l {0}
+      shell: ${{ matrix.os == 'Windows-latest' && 'pwsh' || 'bash' }}
       run: |
         # Add commands to run your tests here
         # Example: pytest tests/
