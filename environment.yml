@@ -12,5 +12,3 @@ dependencies:
   - pip
   - pip:
       - sounddevice
-      - flake8
-      - pytest
