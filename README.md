@@ -11,4 +11,4 @@ This project uses audio files from both the DonateACry audio corpus (https://git
   - testing: test cases to ensure all functions are working as expected
   - refactor: code refactoring to separate the main file into smaller, more manageable files
 
-(Note: Ownership transferred from personal to school account on 11/20/2020)
+*(Note: Ownership transferred from personal to school account on 11/20/2020 due to workflow limitations.)*
