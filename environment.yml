@@ -9,7 +9,6 @@ dependencies:
   - matplotlib
   - scikit-learn
   - joblib
-  - flake8
   - pip
   - pip:
       - sounddevice
