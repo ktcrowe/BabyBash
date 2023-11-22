@@ -9,3 +9,4 @@ This project uses audio files from both the DonateACry audio corpus (https://git
   - interference: removal of the detected cry via destructive interference & output of the enhanced audio
   - optimization: improvements to the neural network to increase accuracy
   - testing: test cases to ensure all functions are working as expected
+  - refactor: code refactoring to separate the main file into smaller, more manageable files
