@@ -18,17 +18,9 @@ jobs:
       uses: conda-incubator/setup-miniconda@v2
       with:
         activate-environment: babybashenv
-        environment-file: environment.yml
+        environment-file: ../../environment.yml
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
-
-    - name: Activate Conda Environment (Unix)
-      if: runner.os != 'Windows'
-      run: echo "source activate babybashenv" >> $GITHUB_ENV
-
-    - name: Activate Conda Environment (Windows)
-      if: runner.os == 'Windows'
-      run: echo "conda activate babybashenv" >> $GITHUB_ENV
 
     - name: Lint with flake8
       run: |
