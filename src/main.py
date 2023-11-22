@@ -1,5 +1,4 @@
 # Import required libraries
-#test
 import os
 import sounddevice as sd  # For audio recording and processing
 import numpy as np  # For numerical operations
@@ -22,14 +21,18 @@ NUM_MFCC_COEFFS = 26  # Number of Mel-frequency cepstral coefficients (MFCCs) to
 MFCC_RANGE = 10  # Range of values for the y-axis on the plot (initially was 275, but reduced to reflect normalized MFCCs)
 N_FFT = BLOCK_SIZE  # Fast Fourier Transform (FFT) window size set to block size
 HOP_LENGTH = N_FFT // 4  # Hop length for the FFT, typically 1/4th of the FFT window size
+AUDIO_FILE_LENGTH = 7  # Length of audio files in seconds (used for normalizing audio length)
 
 # Define paths
 CRYING_PATH = 'data/crying'  # audio files of crying babies
 NOISE_PATH = 'data/noise'  # audio files of various other noises (not babies crying)
 MODELS_PATH = 'models'  # folder where AI models are saved
+MODEL_TO_USE = 'model_v3.pth'  # the model to use for detecting crying babies
 
 RETRAIN = False  # make this true when you wish to generate a new model
+USE_SPECIFIC_MODEL = True  # make this true when you wish to use a specific model (MODEL_TO_USE)
 prediction_text = ''  # the text to be displayed on the GUI to indicate whether a baby is detected
+detected_count = 0  # the number of times a baby has been detected (used for comparing models)
 
 
 # Define a simple neural network
@@ -58,16 +61,65 @@ class AudioClassifier(nn.Module):
         return x
 
 
-# Load and label the files for use in training the network
-def load_files(folder, label):
-    features = []  # holds MFCC values for each file
-    labels = []  # contains the label for each audio file (1 for baby crying, 0 for no baby)
+def normalize_audio_length(audio_path, target_length=AUDIO_FILE_LENGTH, sample_rate=44100):
+    """
+    Normalize the length of an audio file to a target length in seconds.
+
+    Parameters:
+    audio_path (str): Path to the audio file.
+    target_length (int): Desired length of the audio in seconds.
+    sample_rate (int): Sample rate for the audio file.
+
+    Returns:
+    numpy.ndarray: Normalized audio data.
+    """
+
+    # Load the audio file
+    audio, sr = librosa.load(audio_path, sr=sample_rate)
+
+    # Calculate the target number of samples
+    target_samples = target_length * sample_rate
+
+    # Get the number of samples in the audio file
+    current_samples = audio.shape[0]
+
+    # Pad or truncate the audio data
+    if current_samples < target_samples:
+        # Pad with zeros (silence) if the audio is shorter than the target length
+        pad_length = target_samples - current_samples
+        padded_audio = np.pad(audio, (0, pad_length), mode='constant')
+    else:
+        # Truncate the audio if it's longer than the target length
+        padded_audio = audio[:target_samples]
+
+    return padded_audio
+
+
+# # Load and label the files for use in training the network
+# def load_files(folder, label):
+#     features = []  # holds MFCC values for each file
+#     labels = []  # contains the label for each audio file (1 for baby crying, 0 for no baby)
+#     for filename in os.listdir(folder):
+#         if filename.endswith('.wav'):
+#             path = os.path.join(folder, filename)
+#             audio, sr = librosa.load(path, sr=SAMPLE_RATE)  # Load the audio file
+#             mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=NUM_MFCC_COEFFS)  # Extract MFCCs
+#             mfcc = mfcc.mean(axis=1)  # Take the mean of the MFCCs over time
+#             features.append(mfcc)
+#             labels.append(label)
+#     return features, labels
+
+
+# Updated load_files function to normalize audio length
+def load_files(folder, label, target_length=7):
+    features = []
+    labels = []
     for filename in os.listdir(folder):
         if filename.endswith('.wav'):
             path = os.path.join(folder, filename)
-            audio, sr = librosa.load(path, sr=SAMPLE_RATE)  # Load the audio file
-            mfcc = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=NUM_MFCC_COEFFS)  # Extract MFCCs
-            mfcc = mfcc.mean(axis=1)  # Take the mean of the MFCCs over time
+            audio = normalize_audio_length(path, target_length, SAMPLE_RATE)
+            mfcc = librosa.feature.mfcc(y=audio, sr=SAMPLE_RATE, n_mfcc=NUM_MFCC_COEFFS)
+            mfcc = mfcc.mean(axis=1)
             features.append(mfcc)
             labels.append(label)
     return features, labels
@@ -102,7 +154,7 @@ def update_plot(frame):
 def audio_callback(indata, frames, time, status):
     if status:
         print(status)
-    global mfccs, model, scaler, prediction_text
+    global mfccs, model, scaler, prediction_text, detected_count
 
     mfccs = compute_mfcc(indata)  # Compute MFCCs from the input data
     mfccs = scaler.transform([mfccs])  # Standardize the MFCCs (Note: scaler expects a 2D array)
@@ -120,6 +172,8 @@ def audio_callback(indata, frames, time, status):
 
     # Display on the GUI when a crying baby is detected
     prediction_text = "Baby crying detected!" if predicted.item() == 1 else ""
+    detected_count += 1 if predicted.item() == 1 else 0
+    print(f'Detected {detected_count} times.')  # DEBUG
 
 
 # Count the amount of files in a given directory (used for automatically naming models when loading/saving)
@@ -161,13 +215,20 @@ if __name__ == '__main__':
     model = AudioClassifier()  # Initialize the neural network
 
     if not RETRAIN:  # This runs when using a previously generated model
-        model.load_state_dict(torch.load(f'{MODELS_PATH}/model_v{count_files_in_folder(MODELS_PATH)-1}.pth'))  # load an existing model
+        if USE_SPECIFIC_MODEL:  # This runs when using a specific model
+            model.load_state_dict(torch.load(f'{MODELS_PATH}/{MODEL_TO_USE}'))
+            print(f'Loaded model: {MODEL_TO_USE}')
+        else:  # This runs when using the latest model
+            model.load_state_dict(torch.load(f'{MODELS_PATH}/model_v{count_files_in_folder(MODELS_PATH)-1}.pth'))  # load an existing model
+            print(f'Loaded latest model: model_v{count_files_in_folder(MODELS_PATH)-1}.pth')
         scaler = load('models/scaler.joblib')  # load an existing scaler
 
     else:  # This runs when a new model is to be generated
         # Prepare training data
-        crying_features, crying_labels = load_files(CRYING_PATH, 1)  # Load baby crying sounds & label them 1
-        noise_features, noise_labels = load_files(NOISE_PATH, 0)  # Load other noise & label them 0
+        # crying_features, crying_labels = load_files(CRYING_PATH, 1)  # Load baby crying sounds & label them 1
+        # noise_features, noise_labels = load_files(NOISE_PATH, 0)  # Load other noise & label them 0
+        crying_features, crying_labels = load_files(CRYING_PATH, 1, target_length=AUDIO_FILE_LENGTH)
+        noise_features, noise_labels = load_files(NOISE_PATH, 0, target_length=AUDIO_FILE_LENGTH)
 
         # create a 1:1 ratio of positive to negative audio files
         #   (NOTE: We could try shuffling this list before the slice to get different results.)
