@@ -3,10 +3,10 @@ channels:
   - conda-forge
   - defaults
 dependencies:
-  - numpy=1.9.0
-  - librosa=1.8.0
-  - pytorch=1.6.0
-  - matplotlib=1.7.1
+  - numpy
+  - librosa
+  - pytorch
+  - matplotlib
   - scikit-learn
   - joblib
   - sounddevice
