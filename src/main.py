@@ -1,6 +1,6 @@
 # Import required libraries
 import audioclassification as ac  # Neural network for audio classification
-import dataplot as dp  # Tools for plotting and visualization of audio data
+import dataplotting as dp  # Tools for plotting and visualization of audio data
 from filemanagement import load_files  # Tools for file management
 from audioprocessing import AudioProcessor  # Tools for audio processing
 

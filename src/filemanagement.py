@@ -12,12 +12,16 @@ def load_files(folder, label, sample_rate, n_mfcc, normalize_to_length=None):
     labels = []
     for filename in os.listdir(folder):
         if filename.endswith('.wav'):
-            path = os.path.join(folder, filename)
-            audio = normalize_audio_length(path, normalize_to_length, sample_rate) if normalize_to_length else librosa.load(path, sr=sample_rate)[0]
-            mfcc = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=n_mfcc)
-            mfcc = mfcc.mean(axis=1)
-            features.append(mfcc)
-            labels.append(label)
+            try:
+                path = os.path.join(folder, filename)
+                audio = normalize_audio_length(path, normalize_to_length, sample_rate) if normalize_to_length else librosa.load(path, sr=sample_rate)[0]
+                mfcc = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=n_mfcc)
+                mfcc = mfcc.mean(axis=1)
+                features.append(mfcc)
+                labels.append(label)
+            except Exception as e:
+                print(f"Error processing file {filename}: {e}")
+                return None, None
     return features, labels
 
 

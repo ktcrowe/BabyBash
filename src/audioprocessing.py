@@ -6,6 +6,7 @@ import torch  # PyTorch library for neural networks
 import sounddevice as sd  # For audio recording and processing
 
 
+# Class for processing audio input data
 class AudioProcessor:
     def __init__(self, model, data_plotter, sample_rate, block_size, n_mfcc, n_fft, hop_length, verbose=False):
         self.model = model
@@ -20,35 +21,39 @@ class AudioProcessor:
 
     # Function called by the audio stream when new data is available
     def audio_callback(self, indata, frames, time, status):
-        if status:
-            print(status)
+        try:
+            if status:
+                print(status)
 
-        # Compute MFCCs from the input data
-        mfccs = compute_mfcc(indata, sample_rate=self.sample_rate, n_mfcc=self.n_mfcc, n_fft=self.n_fft,
-                             hop_length=self.hop_length)
-        mfccs = self.model.scaler.transform([mfccs])  # Standardize the MFCCs (Note: scaler expects a 2D array)
-        self.data_plotter.update_mfcc_data(mfccs)  # Update the plot with the new MFCCs
-        mfccs_tensor = torch.tensor(mfccs, dtype=torch.float32)  # Convert to tensor
+            # Compute MFCCs from the input data
+            mfccs = compute_mfcc(indata, sample_rate=self.sample_rate, n_mfcc=self.n_mfcc, n_fft=self.n_fft,
+                                 hop_length=self.hop_length)
+            mfccs = self.model.scaler.transform([mfccs])  # Standardize the MFCCs (Note: scaler expects a 2D array)
+            self.data_plotter.update_mfcc_data(mfccs)  # Update the plot with the new MFCCs
+            mfccs_tensor = torch.tensor(mfccs, dtype=torch.float32)  # Convert to tensor
 
-        # Make a prediction (is a baby crying or not?)
-        self.model.eval()  # Set the model to evaluation mode
-        with torch.no_grad():
-            """
-            The above line tells PyTorch not to compute gradients in order to improve performance, since this does not
-            need to be done when we are not training the model.
-            """
-            outputs = self.model(mfccs_tensor)  # run the current MFCCs of the input data through the network
-            _, predicted = torch.max(outputs.data,
-                                     1)  # Retrieve the index of the larger value ('_' ignores the actual value)
+            # Make a prediction (is a baby crying or not?)
+            self.model.eval()  # Set the model to evaluation mode
+            with torch.no_grad():
+                """
+                The above line tells PyTorch not to compute gradients in order to improve performance, since this does not
+                need to be done when we are not training the model.
+                """
+                outputs = self.model(mfccs_tensor)  # run the current MFCCs of the input data through the network
+                _, predicted = torch.max(outputs.data,
+                                         1)  # Retrieve the index of the larger value ('_' ignores the actual value)
 
-        # # Display on the GUI when a crying baby is detected
-        prediction_text = "Baby crying detected!" if predicted.item() == 1 else ""
-        self.data_plotter.update_prediction_text(prediction_text)
+            # # Display on the GUI when a crying baby is detected
+            prediction_text = "Baby crying detected!" if predicted.item() == 1 else ""
+            self.data_plotter.update_prediction_text(prediction_text)
 
-        # Display the number of times a baby has been detected if verbose mode is enabled
-        if self.verbose:
-            self.detected_count += 1 if predicted.item() == 1 else 0
-            print(f'Detected {self.detected_count} times.')
+            # Display the number of times a baby has been detected if verbose mode is enabled
+            if self.verbose:
+                self.detected_count += 1 if predicted.item() == 1 else 0
+                print(f'Detected {self.detected_count} times.')
+
+        except Exception as e:  # Catch any errors that occur during audio processing
+            print(f"An error occurred in audio_callback: {e}")
 
     def open_input_stream(self):
         with sd.InputStream(callback=self.audio_callback, dtype='float32', channels=1,

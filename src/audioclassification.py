@@ -15,7 +15,7 @@ from filemanagement import count_files_in_folder  # Tools for file management
 MODELS_PATH = 'models'  # folder where AI models are saved
 
 
-# Define a simple neural network
+# Define a simple neural network for identifying whether a baby is crying
 class AudioClassifier(nn.Module):
     def __init__(self, n_mfcc):
         super(AudioClassifier, self).__init__()
