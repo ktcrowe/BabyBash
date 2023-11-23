@@ -6,6 +6,7 @@ import torch  # PyTorch library for neural networks
 import sounddevice as sd  # For audio recording and processing
 
 
+# The audio processor class, which is responsible for processing input audio data
 class AudioProcessor:
     def __init__(self, model, data_plotter, sample_rate, block_size, n_mfcc, n_fft, hop_length, verbose=False):
         self.model = model
