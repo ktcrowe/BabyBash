@@ -25,8 +25,9 @@ def test_audio_classifier_initialization(audio_classifier):
     assert isinstance(audio_classifier, AudioClassifier), "AudioClassifier should be correctly instantiated"
 
 
-@patch('torch.save')
-def test_new_model_training(mock_save, audio_classifier):
+@patch('audioclassification.torch.save')
+@patch('joblib.dump')
+def test_new_model_training(mock_dump, mock_save, audio_classifier):
     """
     Test the new_model method of the AudioClassifier class for training.
     """
@@ -40,11 +41,12 @@ def test_new_model_training(mock_save, audio_classifier):
     # Call the new_model method with corrected mock data
     audio_classifier.new_model(mock_features_positive, mock_features_negative,
                                mock_labels_positive, mock_labels_negative,
-                               num_epochs=NUM_EPOCHS, verbose=True)
+                               num_epochs=NUM_EPOCHS, verbose=True, save_scaler=False)
 
     # Assertions to verify training
     assert audio_classifier.scaler is not None, "Scaler should be initialized"
     mock_save.assert_called()  # Check if model is saved after training
+    mock_dump.assert_not_called()  # Ensure scaler is not saved after test with mock data
 
 
 def test_load_model(audio_classifier):

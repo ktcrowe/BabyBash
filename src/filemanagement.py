@@ -19,9 +19,9 @@ def load_files(folder, label, sample_rate, n_mfcc, normalize_to_length=None):
                 mfcc = mfcc.mean(axis=1)
                 features.append(mfcc)
                 labels.append(label)
+
             except Exception as e:
-                print(f"Error processing file {filename}: {e}")
-                return None, None
+                print(f'Error encountered while parsing {filename}: {e}')
     return features, labels
 
 

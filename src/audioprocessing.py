@@ -52,8 +52,8 @@ class AudioProcessor:
                 self.detected_count += 1 if predicted.item() == 1 else 0
                 print(f'Detected {self.detected_count} times.')
 
-        except Exception as e:  # Catch any errors that occur during audio processing
-            print(f"An error occurred in audio_callback: {e}")
+        except Exception as e:
+            print(f'Error during audio callback: {e}')
 
     def open_input_stream(self):
         with sd.InputStream(callback=self.audio_callback, dtype='float32', channels=1,
