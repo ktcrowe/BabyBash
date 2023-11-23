@@ -53,7 +53,6 @@ class AudioProcessor:
     def open_input_stream(self):
         with sd.InputStream(callback=self.audio_callback, dtype='float32', channels=1,
                             samplerate=self.sample_rate, blocksize=self.block_size):
-            print(f'Listening for audio at {self.sample_rate} Hz')  # DEBUG
             self.data_plotter.animate()  # Start the animation of the plot
 
 
