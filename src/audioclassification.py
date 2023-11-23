@@ -15,7 +15,7 @@ from filemanagement import count_files_in_folder  # Tools for file management
 MODELS_PATH = 'models'  # folder where AI models are saved
 
 
-# A simple neural network to detect whether a baby is crying in an audio stream
+# Define a simple neural network for identifying whether a baby is crying
 class AudioClassifier(nn.Module):
     def __init__(self, n_mfcc):
         super(AudioClassifier, self).__init__()
@@ -43,7 +43,7 @@ class AudioClassifier(nn.Module):
 
     # Train a new model
     def new_model(self, positive_features, negative_features, positive_labels, negative_labels,
-                  test_size=0.2, random_state=42, num_epochs=10, verbose=False):
+                  test_size=0.2, random_state=42, num_epochs=10, verbose=False, save_scaler=True):
         print(f'Training new model...') if verbose else None
 
         # create a 1:1 ratio of positive to negative audio files
@@ -62,7 +62,7 @@ class AudioClassifier(nn.Module):
         # Normalize features (MFCCs) with a scaler
         self.scaler = StandardScaler()
         features = self.scaler.fit_transform(features)
-        dump(self.scaler, 'models/scaler.joblib')  # save the scaler
+        dump(self.scaler, 'models/scaler.joblib') if save_scaler else None  # save scaler if specified
         # TODO: Allow for multiple scalers to be saved (one for each model)
 
         """

@@ -1,6 +1,6 @@
 # Import required libraries
 import audioclassification as ac  # Neural network for audio classification
-import dataplot as dp  # Tools for plotting and visualization of audio data
+import dataplotting as dp  # Tools for plotting and visualization of audio data
 from filemanagement import load_files  # Tools for file management
 from audioprocessing import AudioProcessor  # Tools for audio processing
 
@@ -22,7 +22,7 @@ MODEL_TO_USE = 'model_v1.pth'  # the model to use for detecting crying babies (i
 RETRAIN = False  # make this true when you wish to generate a new model
 USE_SPECIFIC_MODEL = True  # make this true when you wish to load a specific model (MODEL_TO_USE) - exclusive with RETRAIN
 NORMALIZE_AUDIO_LENGTH = False  # make this true when you wish to normalize the length of audio files (AUDIO_FILE_LENGTH)
-VERBOSE = True  # make this true when you wish to display additional information in the console when running the program
+VERBOSE = False  # make this true when you wish to display additional information in the console when running the program
 
 # main script
 if __name__ == '__main__':

@@ -4,11 +4,12 @@ channels:
   - defaults
 dependencies:
   - numpy
-  - librosa
+  - conda-forge::librosa
   - pytorch
   - matplotlib
   - scikit-learn
   - joblib
   - pip
+  - numba
   - pip:
       - sounddevice

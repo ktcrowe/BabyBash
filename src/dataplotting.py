@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt  # For plotting data
 from matplotlib.animation import FuncAnimation  # For animating the plot
 
 
-# The audio data plotter class, which is responsible for plotting and visualizing audio data
+# Class for plotting and animating input audio data
 class AudioDataPlotter:
     def __init__(self, n_mfcc, mfcc_range):
         self.n_mfcc = n_mfcc
