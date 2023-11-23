@@ -18,7 +18,6 @@ class AudioProcessor:
         self.n_fft = n_fft
         self.hop_length = hop_length
         self.verbose = verbose
-        # self.prediction_text = ''  # the text to be displayed on the GUI to indicate whether a baby is detected
         self.detected_count = 0  # the number of times a baby has been detected (used for comparing models)
 
     # Function called by the audio stream when new data is available
@@ -30,6 +29,7 @@ class AudioProcessor:
         mfccs = compute_mfcc(indata, sample_rate=self.sample_rate, n_mfcc=self.n_mfcc, n_fft=self.n_fft,
                              hop_length=self.hop_length)
         mfccs = self.model.scaler.transform([mfccs])  # Standardize the MFCCs (Note: scaler expects a 2D array)
+        self.data_plotter.update_mfcc_data(mfccs)  # Update the plot with the new MFCCs
         mfccs_tensor = torch.tensor(mfccs, dtype=torch.float32)  # Convert to tensor
 
         # Make a prediction (is a baby crying or not?)
@@ -44,7 +44,8 @@ class AudioProcessor:
                                      1)  # Retrieve the index of the larger value ('_' ignores the actual value)
 
         # # Display on the GUI when a crying baby is detected
-        # self.prediction_text = "Baby crying detected!" if predicted.item() == 1 else ""
+        prediction_text = "Baby crying detected!" if predicted.item() == 1 else ""
+        self.data_plotter.update_prediction_text(prediction_text)
 
         # Display the number of times a baby has been detected if verbose mode is enabled
         if self.verbose:

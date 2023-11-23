@@ -10,6 +10,7 @@ class AudioDataPlotter:
         self.mfcc_range = mfcc_range
         self.prediction_text = ''  # the text to be displayed on the GUI to indicate whether a baby is detected TODO: fix this
         self.plt = plt
+        self.mfccs = np.zeros(self.n_mfcc)  # Initialize the MFCCs to zeros
 
         # Define the plot to display the input audio in real-time
         self.plt.style.use('fast')  # Set a fast plotting style for real-time updates
@@ -31,14 +32,21 @@ class AudioDataPlotter:
         self.text_element = self.ax.text(0.5, 0.1, '', horizontalalignment='center', verticalalignment='center',
                                          transform=self.ax.transAxes)
 
+    # Update the MFCC data
+    def update_mfcc_data(self, new_mfccs):
+        self.mfccs = new_mfccs
+
+    # Update the prediction text
+    def update_prediction_text(self, text):
+        self.prediction_text = text
+
     # Update the plot with new data
     def update_plot(self, frame):
         """
         This function gets called by the animation framework with a new frame
         (essentially an increment in time/intervals).
         """
-        mfccs = np.zeros(self.n_mfcc)
-        self.line.set_ydata(mfccs)  # Set new y-data for the line object
+        self.line.set_ydata(self.mfccs)  # Set new y-data for the line object
         self.text_element.set_text(self.prediction_text)  # Update the text based on the prediction
 
         """
