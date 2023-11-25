@@ -4,6 +4,7 @@ channels:
   - defaults
 dependencies:
   - numpy
+  - scipy
   - conda-forge::librosa
   - pytorch
   - matplotlib

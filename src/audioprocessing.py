@@ -1,5 +1,7 @@
 # Tools for audio processing
 
+from scipy import signal  # For signal processing
+
 import numpy as np  # For numerical operations
 import librosa  # For audio feature extraction
 import torch  # PyTorch library for neural networks
@@ -8,7 +10,8 @@ import sounddevice as sd  # For audio recording and processing
 
 # Class for processing audio input data
 class AudioProcessor:
-    def __init__(self, model, data_plotter, sample_rate, block_size, n_mfcc, n_fft, hop_length, verbose=False):
+    def __init__(self, model, data_plotter, sample_rate, block_size, n_mfcc, n_fft, hop_length,
+                 key_frequencies, quality_factor, input_device, output_device, verbose=False):
         self.model = model
         self.data_plotter = data_plotter
         self.sample_rate = sample_rate
@@ -16,11 +19,34 @@ class AudioProcessor:
         self.n_mfcc = n_mfcc
         self.n_fft = n_fft
         self.hop_length = hop_length
+        self.key_frequencies = key_frequencies
+        self.quality_factor = quality_factor
+        self.output_device = output_device
+        self.input_device = input_device
         self.verbose = verbose
         self.detected_count = 0  # the number of times a baby has been detected (used for comparing models)
+        self.output_stream = None  # the output stream for playing back audio
+        self.detection_buffer = [0] * 50  # buffer for storing previous predictions (ex: 50 * 20ms = 1 second)
+        self.baby_previously_detected = False  # Flag for detecting when a baby was detected in the buffer
+        self.fade_in_length = 5  # Number of blocks for fade-in
+        self.fade_out_length = 100  # Number of blocks for fade-out
+        self.fade_in_counter = 0  # Counter for fade-in
+        self.fade_out_counter = 0  # Counter for fade-out
+
+        # Initialize the filter's threshold to reduce false positive filtering
+        self.threshold_length = 50  # Number of blocks to check for a baby in the buffer
+        self.threshold = 5  # Number of blocks with a baby in the threshold to trigger filtering
+
+        # # Initialize combined notch filter
+        # self.combined_filter_b, self.combined_filter_a = _combine_notch_filters(
+        #     self.key_frequencies, self.quality_factor, self.sample_rate)
+        # self.filter_state = signal.lfilter_zi(self.combined_filter_b, self.combined_filter_a)
+
+        self.lp_filter_b, self.lp_filter_a = initialize_low_pass_filter(cutoff_freq=1000, fs=self.sample_rate)
+        self.filter_state = signal.lfilter_zi(self.lp_filter_b, self.lp_filter_a)
 
     # Function called by the audio stream when new data is available
-    def audio_callback(self, indata, frames, time, status):
+    def audio_callback(self, indata, outdata, frames, time, status):
         try:
             if status:
                 print(status)
@@ -43,9 +69,23 @@ class AudioProcessor:
                 _, predicted = torch.max(outputs.data,
                                          1)  # Retrieve the index of the larger value ('_' ignores the actual value)
 
-            # # Display on the GUI when a crying baby is detected
+            # Update GUI when a crying baby is detected
             prediction_text = "Baby crying detected!" if predicted.item() == 1 else ""
             self.data_plotter.update_prediction_text(prediction_text)
+
+            # Process audio block with filters
+            baby_detected = predicted.item() == 1
+            self.update_detection_buffer(baby_detected)
+            fade_factor = self.calculate_fade_factor()
+            self.update_filter_activity_text(fade_factor)
+
+            if fade_factor > 0:
+                # Apply the filter with the maintained filter state
+                filtered_audio, self.filter_state = signal.lfilter(self.lp_filter_b, self.lp_filter_a, indata[:, 0],
+                                                                   zi=self.filter_state)
+                outdata[:] = (fade_factor * filtered_audio + (1 - fade_factor) * indata[:, 0]).reshape(-1, 1)
+            else:
+                outdata[:] = indata
 
             # Display the number of times a baby has been detected if verbose mode is enabled
             if self.verbose:
@@ -55,10 +95,41 @@ class AudioProcessor:
         except Exception as e:
             print(f'Error during audio callback: {e}')
 
-    def open_input_stream(self):
-        with sd.InputStream(callback=self.audio_callback, dtype='float32', channels=1,
-                            samplerate=self.sample_rate, blocksize=self.block_size):
-            self.data_plotter.animate()  # Start the animation of the plot
+    def update_detection_buffer(self, current_detection):
+        # Update detection buffer with the current detection
+        self.detection_buffer.pop(0)  # Remove oldest detection
+        self.detection_buffer.append(current_detection)  # Add the newest detection
+
+    def calculate_fade_factor(self):
+        # Calculate recent detections within the threshold length
+        recent_detections = sum(self.detection_buffer[-self.threshold_length:])
+        if recent_detections > self.threshold:
+            self.fade_in_counter = min(self.fade_in_counter + 1, self.fade_in_length)
+            self.fade_out_counter = 0  # Interrupt fade-out if baby is detected again
+        else:
+            self.fade_in_counter = max(self.fade_in_counter - 1, 0)
+            if self.fade_out_counter == 0 and self.baby_previously_detected:
+                self.fade_out_counter = self.fade_out_length  # Start fade-out if no new detection
+
+        # Calculate the filter's fade factor based on the fade counters
+        if self.fade_in_counter > 0:
+            return self.fade_in_counter / self.fade_in_length
+        return self.fade_out_counter / self.fade_out_length
+
+    # Update the text on the plot to indicate whether the filter is active
+    def update_filter_activity_text(self, fade_factor):
+        filter_active_text = "Baby bashing!" if fade_factor > 0 else ""
+        self.data_plotter.update_filter_activity_text(filter_active_text, fade_factor)
+
+    # Open the input and output audio streams and start processing audio
+    def open_streams(self):
+        try:
+            with sd.Stream(callback=self.audio_callback, dtype='float32', channels=1,
+                           samplerate=self.sample_rate, blocksize=self.block_size,
+                           device=(self.input_device, self.output_device)) as stream:
+                self.data_plotter.animate()  # Start the animation of the plot
+        except Exception as e:
+            print(f'Error opening streams: {e}')
 
 
 # Compute Mel-frequency cepstral coefficients (MFCCs) from an audio buffer
@@ -68,6 +139,101 @@ def compute_mfcc(indata, sample_rate, n_mfcc, n_fft, hop_length):
                                  n_mfcc=n_mfcc, n_fft=n_fft,
                                  hop_length=hop_length).T
     return np.mean(mfccs, axis=0)
+
+
+# Compute MFCCs from an audio file
+def compute_mfcc_from_file(file_path, sample_rate, n_mfcc, n_fft, hop_length):
+    audio, _ = librosa.load(file_path, sr=sample_rate)  # Load the audio file, ignore returned sample rate
+
+    # Compute the MFCCs for the input data, transpose it, and take the mean across time
+    mfccs = librosa.feature.mfcc(y=audio, sr=sample_rate,
+                                 n_mfcc=n_mfcc, n_fft=n_fft,
+                                 hop_length=hop_length).T
+    return np.mean(mfccs, axis=0)
+
+
+def initialize_low_pass_filter(cutoff_freq, fs, order=5):
+    """
+    Initialize a low-pass filter.
+
+    Parameters:
+    - cutoff_freq: Cutoff frequency of the low-pass filter (in Hz).
+    - fs: Sampling rate (in Hz).
+    - order: Order of the filter.
+
+    Returns:
+    - b, a: Numerator (b) and denominator (a) polynomials of the IIR filter.
+    """
+    nyquist = 0.5 * fs
+    normal_cutoff = cutoff_freq / nyquist
+    filter_coefs = signal.butter(order, normal_cutoff, btype='low', analog=False)
+    return filter_coefs[0], filter_coefs[1]
+
+
+# initialize notch filters for filtering out key frequencies
+def initialize_notch_filters(key_freqs, Q, fs):
+    """
+    Initialize notch filters for each key frequency.
+
+    Parameters:
+    - key_freqs: List of key frequencies to be notched out.
+    - Q: Quality factor for notch filters.
+    - fs: Sampling rate.
+
+    Returns:
+    - List of filter coefficients and initial states.
+    """
+    filters = []
+    for f0 in key_freqs:
+        b, a = create_notch_filter(f0, Q, fs)
+        b = b.astype(np.float32)
+        a = a.astype(np.float32)
+        zi = signal.lfilter_zi(b, a).astype(np.float32)
+        filters.append((b, a, zi))
+    return filters
+
+
+def create_notch_filter(f0, Q, fs):
+    """
+    Design a notch filter using a specified center frequency, quality factor, and sampling rate.
+
+    Parameters:
+    - f0: Center frequency of the notch (in Hz).
+    - Q: Quality factor of the notch filter.
+    - fs: Sampling rate (in Hz).
+
+    Returns:
+    - b, a: Numerator (b) and denominator (a) polynomials of the IIR filter.
+    """
+    b, a = signal.iirnotch(f0, Q, fs)
+    return b, a
+
+
+# Combine multiple notch filters into a single filter
+def _combine_notch_filters(key_freqs, Q, fs):
+    b_combined, a_combined = np.array([1.0]), np.array([1.0])
+    for f0 in key_freqs:
+        b, a = signal.iirnotch(f0, Q, fs)
+        b_combined, a_combined = signal.convolve(b_combined, b), signal.convolve(a_combined, a)
+    return b_combined, a_combined
+
+
+def process_audio_block(audio_block, filters):
+    """
+    Process an audio block with multiple notch filters.
+
+    Parameters:
+    - audio_block: The audio block to process.
+    - filters: List of filters with their coefficients and states.
+
+    Returns:
+    - The processed audio block.
+    """
+    for i in range(len(filters)):
+        b, a, zi = filters[i]
+        audio_block, zi = signal.lfilter(b, a, audio_block, zi=zi * audio_block[0])
+        filters[i] = (b, a, zi)  # Update the filter's state
+    return audio_block
 
 
 # normalize audio files to a target length in seconds

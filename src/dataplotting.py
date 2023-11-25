@@ -9,7 +9,6 @@ class AudioDataPlotter:
     def __init__(self, n_mfcc, mfcc_range):
         self.n_mfcc = n_mfcc
         self.mfcc_range = mfcc_range
-        self.prediction_text = ''  # the text to be displayed on the GUI to indicate whether a baby is detected TODO: fix this
         self.plt = plt
         self.mfccs = np.zeros(self.n_mfcc)  # Initialize the MFCCs to zeros
 
@@ -30,8 +29,15 @@ class AudioDataPlotter:
         self.ax.set_title('Real-time MFCC')  # Set the title for the plot
 
         # Initialize the text element on the plot to display when a baby is crying
-        self.text_element = self.ax.text(0.5, 0.1, '', horizontalalignment='center', verticalalignment='center',
-                                         transform=self.ax.transAxes)
+        self.prediction_text = ''  # the text to be displayed on the GUI to indicate whether a baby is detected
+        self.prediction_text_element = self.ax.text(0.5, 0.1, '', horizontalalignment='center', verticalalignment='center',
+                                                    transform=self.ax.transAxes)
+
+        # Initialize the filter activity text element
+        self.filter_activity_text = ''
+        self.filter_activity_text_element = self.ax.text(0.5, 0.04, '', horizontalalignment='center',
+                                                         verticalalignment='center', transform=self.ax.transAxes,
+                                                         color='red', fontsize=10)
 
     # Update the MFCC data
     def update_mfcc_data(self, new_mfccs):
@@ -41,6 +47,11 @@ class AudioDataPlotter:
     def update_prediction_text(self, text):
         self.prediction_text = text
 
+    # Update the filter activity text
+    def update_filter_activity_text(self, text, transparency):
+        self.filter_activity_text = text
+        self.filter_activity_text_element.set_alpha(transparency)
+
     # Update the plot with new data
     def update_plot(self, frame):
         """
@@ -48,13 +59,14 @@ class AudioDataPlotter:
         (essentially an increment in time/intervals).
         """
         self.line.set_ydata(self.mfccs)  # Set new y-data for the line object
-        self.text_element.set_text(self.prediction_text)  # Update the text based on the prediction
+        self.prediction_text_element.set_text(self.prediction_text)  # Update the text based on the prediction
+        self.filter_activity_text_element.set_text(self.filter_activity_text)  # Update the filter activity text
 
         """
         Return the line object that has been modified, which is necessary for blitting to work.
         "Blitting" means that the animation only re-draws the parts that have actually changed to improve the animation
         """
-        return self.line, self.text_element
+        return self.line, self.prediction_text_element, self.filter_activity_text_element
 
     # animate the plot
     def animate(self):
