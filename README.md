@@ -3,7 +3,7 @@ AI Audio Removal
 
 This is a prototype of AI driven software that aims to remove unwanted noises from input audio signals.  In this case, we aim to dampen the sound of crying babies.
 
-This project uses audio files from both the DonateACry audio corpus (https://github.com/gveres/donateacry-corpus) and the ESC-50 Dataset (https://github.com/karolpiczak/ESC-50) for both positive and negative audio samples.
+This project uses audio files from both the DonateACry audio corpus for positive audio samples (https://github.com/gveres/donateacry-corpus) and the ESC-50 Dataset for both positive and negative audio samples (https://github.com/karolpiczak/ESC-50).
 
 ### Current branches:
   - interference: dampening of the detected cry & output of the filtered audio
