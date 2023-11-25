@@ -1,9 +1,9 @@
 # Tests for the audioprocessing module
 
 import pytest
-from unittest.mock import patch, MagicMock, Mock
 import numpy as np
 import torch
+from unittest.mock import patch, MagicMock, Mock
 
 # Import the AudioProcessor class
 from audioprocessing import AudioProcessor, compute_mfcc, normalize_audio_length
@@ -22,82 +22,79 @@ mock_audio_buffer = np.random.rand(BLOCK_SIZE, 1)
 
 @pytest.fixture
 def mock_model():
-    # Mock model with necessary attributes and methods
+    """
+    Fixture to create a mock model with necessary attributes and methods.
+    """
     model = MagicMock()
-    model.scaler = MagicMock()
-    model.eval = Mock()
-
-    # Mock model call to return a tensor-like object
-    mock_output_tensor = torch.tensor([[0, 1]], dtype=torch.float32)  # Simulate a tensor returned by the model
-    model.return_value = mock_output_tensor  # When model is called, it returns the mock tensor
-
+    model.eval = MagicMock()
+    model.return_value = torch.tensor([[0.1, 0.9]])  # Simulate prediction tensor
     return model
 
 
 @pytest.fixture
 def mock_data_plotter():
-    # Mock data plotter with necessary methods
+    """
+    Fixture to create a mock data plotter with necessary methods.
+    """
     plotter = MagicMock()
-    plotter.update_mfcc_data = Mock()
-    plotter.update_prediction_text = Mock()
-    plotter.animate = Mock()
+    plotter.update_mfcc_data = MagicMock()
+    plotter.update_prediction_text = MagicMock()
+    plotter.animate = MagicMock()
     return plotter
 
 
 def test_audio_callback(mock_model, mock_data_plotter):
     """
-    Test the audio_callback method of the AudioProcessor class.
+    Test the audio_callback method in the AudioProcessor class.
     """
-    # Create an instance of AudioProcessor with mock dependencies
-    audio_processor = AudioProcessor(mock_model, mock_data_plotter, SAMPLE_RATE, BLOCK_SIZE, N_MFCC, N_FFT, HOP_LENGTH, verbose=True)
+    processor = AudioProcessor(mock_model, mock_data_plotter, SAMPLE_RATE, BLOCK_SIZE, N_MFCC, N_FFT, HOP_LENGTH, 1, 2,
+                               verbose=True)
 
-    # Mock the status object passed to the callback
-    mock_status = Mock()
+    # Mock input and output data for callback
+    indata = np.random.rand(BLOCK_SIZE, 1)
+    outdata = np.zeros_like(indata)
 
     # Call the audio_callback method
-    audio_processor.audio_callback(mock_audio_buffer, BLOCK_SIZE, None, mock_status)
+    processor.audio_callback(indata, outdata, BLOCK_SIZE, None, None)
 
-    # Assertions to verify the behavior
-    mock_model.eval.assert_called_once()  # Check if model's eval method was called
-    mock_model.scaler.transform.assert_called()  # Check if scaler's transform method was called
-    mock_data_plotter.update_mfcc_data.assert_called()  # Check if plotter's update_mfcc_data was called
-    mock_data_plotter.update_prediction_text.assert_called()  # Check if plotter's update_prediction_text was called
+    # Verify that the model's eval method was called
+    mock_model.eval.assert_called_once()
 
-    # Assert the detected_count is updated correctly
-    assert audio_processor.detected_count == 0 or audio_processor.detected_count == 1
+    # Verify update methods on data plotter were called
+    mock_data_plotter.update_mfcc_data.assert_called()
+    mock_data_plotter.update_prediction_text.assert_called()
+
+    # Verify changes in output data
+    assert not np.array_equal(outdata, np.zeros_like(indata)), "Output data should be modified in the callback"
 
 
 def test_compute_mfcc():
     """
-    Test the compute_mfcc function.
+    Test the compute_mfcc function to ensure it returns MFCCs with the correct shape.
     """
     mfccs = compute_mfcc(mock_audio_buffer, SAMPLE_RATE, N_MFCC, N_FFT, HOP_LENGTH)
-    assert mfccs.shape[0] == N_MFCC, "MFCCs should have the correct number of coefficients"
+    assert mfccs.shape == (N_MFCC,), "MFCCs should have the correct number of coefficients"
 
 
+# Updated test_normalize_audio_length
 def test_normalize_audio_length():
     """
-    Test the normalize_audio_length function.
+    Test the normalize_audio_length function to ensure it correctly pads or truncates audio data.
     """
-    # Setup: Create a mock audio file shorter than the target length
-    short_audio_length = 3  # seconds (shorter than target)
-    short_audio_data = np.random.rand(short_audio_length * SAMPLE_RATE)
+    # Mocked audio data lengths
+    short_audio_length = int(AUDIO_LENGTH / 2 * SAMPLE_RATE)
+    long_audio_length = int(AUDIO_LENGTH * 1.5 * SAMPLE_RATE)
 
-    # Setup: Create a mock audio file longer than the target length
-    long_audio_length = 10  # seconds (longer than target)
-    long_audio_data = np.random.rand(long_audio_length * SAMPLE_RATE)
+    # Mock librosa.load to return audio data of specific lengths
+    with patch('librosa.load') as mock_load:
+        # Configure the mock to return an array of specific length and the sample rate
+        mock_load.side_effect = lambda file_path, sr: (np.zeros(short_audio_length), sr) if 'short' in file_path else (
+        np.zeros(long_audio_length), sr)
 
-    # Target length for normalization
-    target_length = AUDIO_LENGTH  # 7 seconds
-
-    # Mock librosa.load to return short and long audio data
-    with patch('librosa.load', side_effect=[(short_audio_data, SAMPLE_RATE), (long_audio_data, SAMPLE_RATE)]):
-        # Normalize short audio
-        normalized_short_audio = normalize_audio_length('path/to/short_audio.wav', target_length, SAMPLE_RATE)
-        # Normalize long audio
-        normalized_long_audio = normalize_audio_length('path/to/long_audio.wav', target_length, SAMPLE_RATE)
+        # Normalize short and long audio data
+        normalized_short_audio = normalize_audio_length('path/to/short_audio.wav', AUDIO_LENGTH, SAMPLE_RATE)
+        normalized_long_audio = normalize_audio_length('path/to/long_audio.wav', AUDIO_LENGTH, SAMPLE_RATE)
 
     # Assertions
-    assert len(normalized_short_audio) == target_length * SAMPLE_RATE, "Short audio should be padded to target length"
-    assert len(normalized_long_audio) == target_length * SAMPLE_RATE, "Long audio should be truncated to target length"
-
+    assert len(normalized_short_audio) == AUDIO_LENGTH * SAMPLE_RATE, "Short audio should be padded to target length"
+    assert len(normalized_long_audio) == AUDIO_LENGTH * SAMPLE_RATE, "Long audio should be truncated to target length"

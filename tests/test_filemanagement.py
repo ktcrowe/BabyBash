@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import patch, MagicMock
 import numpy as np
 
-from filemanagement import load_files, count_files_in_folder
+from filemanagement import load_data, count_files_in_folder
 
 # Mock data for testing
 SAMPLE_RATE = 44100
@@ -23,9 +23,9 @@ def mock_load(file_path, sr=SAMPLE_RATE):
 # Mock os.listdir to control the list of files returned
 @patch('librosa.load', side_effect=mock_load)
 @patch('os.listdir')
-def test_load_files(mock_listdir, mock_load):  # Notice the order and inclusion of mock objects as arguments
+def test_load_data(mock_listdir, mock_load):  # Notice the order and inclusion of mock objects as arguments
     """
-    Test the load_files function from filemanagement.py
+    Test the load_data function from filemanagement.py
     """
     # Setup mock environment
     mock_listdir.return_value = ['file1.wav', 'file2.wav']
@@ -36,7 +36,7 @@ def test_load_files(mock_listdir, mock_load):  # Notice the order and inclusion 
     expected_number_of_files = 2
 
     # Call the function under test
-    features, labels = load_files('mock_folder', expected_label, SAMPLE_RATE, N_MFCC, NORMALIZE_LENGTH)
+    features, labels = load_data('mock_folder', expected_label, SAMPLE_RATE, N_MFCC, NORMALIZE_LENGTH)
 
     # Assertions
     assert len(features) == expected_number_of_files, "Incorrect number of features returned"

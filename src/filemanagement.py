@@ -7,7 +7,7 @@ from audioprocessing import normalize_audio_length  # Tools for audio processing
 
 
 # load files from a given folder and return the features (MFCCs) and labels (normalizing audio length if specified)
-def load_files(folder, label, sample_rate, n_mfcc, normalize_to_length=None):
+def load_data(folder, label, sample_rate, n_mfcc, normalize_to_length=None):
     features = []
     labels = []
     for filename in os.listdir(folder):

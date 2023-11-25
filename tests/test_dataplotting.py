@@ -51,8 +51,21 @@ def test_update_prediction_text():
     assert plotter.prediction_text == test_text, "Prediction text should be updated correctly"
 
 
-# Note: Testing the actual plot update and animation can be challenging due to their graphical and interactive nature.
-# These aspects are often better validated through manual testing or integration tests.
+def test_update_filter_activity_text():
+    """
+    Test the update_filter_activity_text method of the AudioDataPlotter class.
+    """
+    plotter = AudioDataPlotter(N_MFCC, MFCC_RANGE)
+    test_text = "Filter Active"
+    test_transparency = 0.5
+
+    # Update the filter activity text
+    plotter.update_filter_activity_text(test_text, test_transparency)
+
+    # Assertions to verify the update
+    assert plotter.filter_activity_text == test_text, "Filter activity text should be updated correctly"
+    assert plotter.filter_activity_text_element.get_alpha() == test_transparency, "Filter activity text transparency should be updated correctly"
+
 
 # This allows running the tests via command line
 if __name__ == "__main__":

@@ -11,7 +11,7 @@ import sounddevice as sd  # For audio recording and processing
 # Class for processing audio input data
 class AudioProcessor:
     def __init__(self, model, data_plotter, sample_rate, block_size, n_mfcc, n_fft, hop_length,
-                 key_frequencies, quality_factor, input_device, output_device, verbose=False):
+                 input_device, output_device, verbose=False):
         self.model = model
         self.data_plotter = data_plotter
         self.sample_rate = sample_rate
@@ -19,11 +19,10 @@ class AudioProcessor:
         self.n_mfcc = n_mfcc
         self.n_fft = n_fft
         self.hop_length = hop_length
-        self.key_frequencies = key_frequencies
-        self.quality_factor = quality_factor
         self.output_device = output_device
         self.input_device = input_device
         self.verbose = verbose
+
         self.detected_count = 0  # the number of times a baby has been detected (used for comparing models)
         self.output_stream = None  # the output stream for playing back audio
         self.detection_buffer = [0] * 50  # buffer for storing previous predictions (ex: 50 * 20ms = 1 second)
@@ -36,11 +35,6 @@ class AudioProcessor:
         # Initialize the filter's threshold to reduce false positive filtering
         self.threshold_length = 50  # Number of blocks to check for a baby in the buffer
         self.threshold = 5  # Number of blocks with a baby in the threshold to trigger filtering
-
-        # # Initialize combined notch filter
-        # self.combined_filter_b, self.combined_filter_a = _combine_notch_filters(
-        #     self.key_frequencies, self.quality_factor, self.sample_rate)
-        # self.filter_state = signal.lfilter_zi(self.combined_filter_b, self.combined_filter_a)
 
         self.lp_filter_b, self.lp_filter_a = initialize_low_pass_filter(cutoff_freq=1000, fs=self.sample_rate)
         self.filter_state = signal.lfilter_zi(self.lp_filter_b, self.lp_filter_a)
@@ -95,11 +89,13 @@ class AudioProcessor:
         except Exception as e:
             print(f'Error during audio callback: {e}')
 
+    # Update the buffer of previous blocks with the current detection
     def update_detection_buffer(self, current_detection):
         # Update detection buffer with the current detection
         self.detection_buffer.pop(0)  # Remove oldest detection
         self.detection_buffer.append(current_detection)  # Add the newest detection
 
+    # Calculate the fade factor for the filter (this is where fade-in/out is implemented)
     def calculate_fade_factor(self):
         # Calculate recent detections within the threshold length
         recent_detections = sum(self.detection_buffer[-self.threshold_length:])
@@ -141,17 +137,7 @@ def compute_mfcc(indata, sample_rate, n_mfcc, n_fft, hop_length):
     return np.mean(mfccs, axis=0)
 
 
-# Compute MFCCs from an audio file
-def compute_mfcc_from_file(file_path, sample_rate, n_mfcc, n_fft, hop_length):
-    audio, _ = librosa.load(file_path, sr=sample_rate)  # Load the audio file, ignore returned sample rate
-
-    # Compute the MFCCs for the input data, transpose it, and take the mean across time
-    mfccs = librosa.feature.mfcc(y=audio, sr=sample_rate,
-                                 n_mfcc=n_mfcc, n_fft=n_fft,
-                                 hop_length=hop_length).T
-    return np.mean(mfccs, axis=0)
-
-
+# Create a low-pass filter that crying babies will be run through
 def initialize_low_pass_filter(cutoff_freq, fs, order=5):
     """
     Initialize a low-pass filter.
@@ -168,72 +154,6 @@ def initialize_low_pass_filter(cutoff_freq, fs, order=5):
     normal_cutoff = cutoff_freq / nyquist
     filter_coefs = signal.butter(order, normal_cutoff, btype='low', analog=False)
     return filter_coefs[0], filter_coefs[1]
-
-
-# initialize notch filters for filtering out key frequencies
-def initialize_notch_filters(key_freqs, Q, fs):
-    """
-    Initialize notch filters for each key frequency.
-
-    Parameters:
-    - key_freqs: List of key frequencies to be notched out.
-    - Q: Quality factor for notch filters.
-    - fs: Sampling rate.
-
-    Returns:
-    - List of filter coefficients and initial states.
-    """
-    filters = []
-    for f0 in key_freqs:
-        b, a = create_notch_filter(f0, Q, fs)
-        b = b.astype(np.float32)
-        a = a.astype(np.float32)
-        zi = signal.lfilter_zi(b, a).astype(np.float32)
-        filters.append((b, a, zi))
-    return filters
-
-
-def create_notch_filter(f0, Q, fs):
-    """
-    Design a notch filter using a specified center frequency, quality factor, and sampling rate.
-
-    Parameters:
-    - f0: Center frequency of the notch (in Hz).
-    - Q: Quality factor of the notch filter.
-    - fs: Sampling rate (in Hz).
-
-    Returns:
-    - b, a: Numerator (b) and denominator (a) polynomials of the IIR filter.
-    """
-    b, a = signal.iirnotch(f0, Q, fs)
-    return b, a
-
-
-# Combine multiple notch filters into a single filter
-def _combine_notch_filters(key_freqs, Q, fs):
-    b_combined, a_combined = np.array([1.0]), np.array([1.0])
-    for f0 in key_freqs:
-        b, a = signal.iirnotch(f0, Q, fs)
-        b_combined, a_combined = signal.convolve(b_combined, b), signal.convolve(a_combined, a)
-    return b_combined, a_combined
-
-
-def process_audio_block(audio_block, filters):
-    """
-    Process an audio block with multiple notch filters.
-
-    Parameters:
-    - audio_block: The audio block to process.
-    - filters: List of filters with their coefficients and states.
-
-    Returns:
-    - The processed audio block.
-    """
-    for i in range(len(filters)):
-        b, a, zi = filters[i]
-        audio_block, zi = signal.lfilter(b, a, audio_block, zi=zi * audio_block[0])
-        filters[i] = (b, a, zi)  # Update the filter's state
-    return audio_block
 
 
 # normalize audio files to a target length in seconds
