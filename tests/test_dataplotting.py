@@ -65,8 +65,3 @@ def test_update_filter_activity_text():
     # Assertions to verify the update
     assert plotter.filter_activity_text == test_text, "Filter activity text should be updated correctly"
     assert plotter.filter_activity_text_element.get_alpha() == test_transparency, "Filter activity text transparency should be updated correctly"
-
-
-# This allows running the tests via command line
-if __name__ == "__main__":
-    pytest.main()

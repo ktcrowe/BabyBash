@@ -77,8 +77,3 @@ def test_count_files_in_non_existing_folder(mock_path_exists):
 
     # Assertions
     assert response == "Folder not found.", "Should return 'Folder not found.' for non-existing folder"
-
-
-# This allows running the tests via command line
-if __name__ == "__main__":
-    pytest.main()
