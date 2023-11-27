@@ -1,22 +1,22 @@
 name: BabyBash CI
 
 # This workflow is triggered on pushes and pull requests to the main branch.
-on:
-  push:
-    branches:
-      - main
-      - testing
-  pull_request:
-    branches:
-      - main
-      - testing
+on: pass
+#  push:
+#    branches:
+#      - main
+#      - testing
+#  pull_request:
+#    branches:
+#      - main
+#      - testing
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macOS-latest, ubuntu-latest, windows-latest]
+        os: [macOS-latest, ubuntu-latest]
         python-version: ['3.11.5']
 
     steps:
@@ -44,22 +44,3 @@ jobs:
     - name: Run Tests
       run: |
         # pytest tests/  (TODO: Re-enable at a later date. Run tests locally for now.)
-
-# These steps are commented out due to issues with pyinstaller and GitHub Actions. Build manually for now.
-#    - name: Build Executable for macOS
-#      if: matrix.os == 'macOS-latest'
-#      run: pyinstaller build-macos.spec
-#
-#    - name: Build Executable for Linux
-#      if: matrix.os == 'ubuntu-latest'
-#      run: pyinstaller build-linux.spec
-#
-#    - name: Build Executable for Windows
-#      if: matrix.os == 'windows-latest'
-#      run: pyinstaller build-windows.spec
-#
-#    - name: Upload Artifacts
-#      uses: actions/upload-artifact@v2
-#      with:
-#        name: BabyBash-${{ matrix.os }}
-#        path: dist/
