@@ -6,18 +6,22 @@ import librosa  # For audio feature extraction
 from audioprocessing import normalize_audio_length  # Tools for audio processing
 
 
-# load files from a given folder and return the features and labels (normalizing audio length if specified)
-def load_files(folder, label, sample_rate, n_mfcc, normalize_to_length=None):
+# load files from a given folder and return the features (MFCCs) and labels (normalizing audio length if specified)
+def load_data(folder, label, sample_rate, n_mfcc, normalize_to_length=None):
     features = []
     labels = []
     for filename in os.listdir(folder):
         if filename.endswith('.wav'):
-            path = os.path.join(folder, filename)
-            audio = normalize_audio_length(path, normalize_to_length, sample_rate) if normalize_to_length else librosa.load(path, sr=sample_rate)[0]
-            mfcc = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=n_mfcc)
-            mfcc = mfcc.mean(axis=1)
-            features.append(mfcc)
-            labels.append(label)
+            try:
+                path = os.path.join(folder, filename)
+                audio = normalize_audio_length(path, normalize_to_length, sample_rate) if normalize_to_length else librosa.load(path, sr=sample_rate)[0]
+                mfcc = librosa.feature.mfcc(y=audio, sr=sample_rate, n_mfcc=n_mfcc)
+                mfcc = mfcc.mean(axis=1)
+                features.append(mfcc)
+                labels.append(label)
+
+            except Exception as e:
+                print(f'Error encountered while parsing {filename}: {e}')
     return features, labels
 
 

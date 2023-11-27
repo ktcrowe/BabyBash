@@ -12,13 +12,12 @@ from joblib import dump, load  # For saving and loading objects (the scaler in t
 
 from filemanagement import count_files_in_folder  # Tools for file management
 
-MODELS_PATH = 'models'  # folder where AI models are saved
 
-
-# Define a simple neural network
+# Define a simple neural network for identifying whether a baby is crying
 class AudioClassifier(nn.Module):
-    def __init__(self, n_mfcc):
+    def __init__(self, n_mfcc, models_path):
         super(AudioClassifier, self).__init__()
+        self.models_path = models_path
         self.scaler = None
         """
         The two parameters taken by each layer are the number of input features and the number of output features.
@@ -43,7 +42,7 @@ class AudioClassifier(nn.Module):
 
     # Train a new model
     def new_model(self, positive_features, negative_features, positive_labels, negative_labels,
-                  test_size=0.2, random_state=42, num_epochs=10, verbose=False):
+                  test_size=0.2, random_state=42, num_epochs=10, verbose=False, save_scaler=True):
         print(f'Training new model...') if verbose else None
 
         # create a 1:1 ratio of positive to negative audio files
@@ -62,7 +61,7 @@ class AudioClassifier(nn.Module):
         # Normalize features (MFCCs) with a scaler
         self.scaler = StandardScaler()
         features = self.scaler.fit_transform(features)
-        dump(self.scaler, 'models/scaler.joblib')  # save the scaler
+        dump(self.scaler, 'models/scaler.joblib') if save_scaler else None  # save scaler if specified
         # TODO: Allow for multiple scalers to be saved (one for each model)
 
         """
@@ -125,15 +124,15 @@ class AudioClassifier(nn.Module):
 
         print(f'Accuracy of the model on the test data: {100 * correct / total}%')  # print accuracy after all epochs
         torch.save(self.state_dict(),
-                   f'{MODELS_PATH}/model_v{count_files_in_folder(MODELS_PATH)}.pth')  # Save the model
+                   f'{self.models_path}/model_v{count_files_in_folder(self.models_path)}.pth')  # Save the model
 
     # Load an existing model (defaults to the latest model)
     def load_model(self, model_name=None, verbose=False):
         if model_name:  # This runs when using a specific model
-            self.load_state_dict(torch.load(f'{MODELS_PATH}/{model_name}'))  # TODO: Handle invalid model name
+            self.load_state_dict(torch.load(f'{self.models_path}/{model_name}'))  # TODO: Handle invalid model name
             print(f'Loaded model: {model_name}') if verbose else None
         else:  # This runs when using the latest model
             self.load_state_dict(torch.load(
-                f'{MODELS_PATH}/model_v{count_files_in_folder(MODELS_PATH) - 1}.pth'))  # load latest model
-            print(f'Loaded latest model: model_v{count_files_in_folder(MODELS_PATH) - 1}.pth') if verbose else None
-        self.scaler = load('models/scaler.joblib')  # load an existing scaler
+                f'{self.models_path}/model_v{count_files_in_folder(self.models_path) - 1}.pth'))  # load latest model
+            print(f'Loaded latest model: model_v{count_files_in_folder(self.models_path) - 1}.pth') if verbose else None
+        self.scaler = load(f'{self.models_path}/scaler.joblib')  # load an existing scaler
