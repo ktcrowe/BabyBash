@@ -7,7 +7,7 @@ import sounddevice as sd
 class DeviceSelector:
     def __init__(self, master):
         self.master = master
-        self.master.title("Select Audio Devices")
+        self.master.title("BabyBash")
 
         self.input_menu = None
         self.output_menu = None
