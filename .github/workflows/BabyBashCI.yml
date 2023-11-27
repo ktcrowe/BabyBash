@@ -31,8 +31,9 @@ jobs:
         auto-activate-base: false
 
     - name: Activate Conda Environment and Check Setup
+      shell: bash -l {0}
       run: |
-        conda activate babybashenv
+        source activate babybashenv
         python --version
         conda list
 
