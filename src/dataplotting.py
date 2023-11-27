@@ -1,7 +1,10 @@
 # Plotting and visualization of audio data
+import matplotlib
 import numpy as np  # For numerical operations
 import matplotlib.pyplot as plt  # For plotting data
 from matplotlib.animation import FuncAnimation  # For animating the plot
+
+matplotlib.use('TkAgg')  # Use TkAgg backend for matplotlib (this ensures the plot stays open when running as a PyInstaller bundle)
 
 
 # Class for plotting and animating input audio data
@@ -15,6 +18,7 @@ class AudioDataPlotter:
         # Define the plot to display the input audio in real-time
         self.plt.style.use('fast')  # Set a fast plotting style for real-time updates
         self.fig, self.ax = self.plt.subplots()  # Initialize the plot figure and axis
+        self.fig.canvas.manager.set_window_title('BabyBash')  # Set window title for the plot
         self.x_axis = np.arange(n_mfcc)  # Generate x-axis values corresponding to the MFCC coefficients
         self.line, = self.ax.plot(self.x_axis, np.zeros(n_mfcc))  # Create an initial line object with x-axis and y-axis data for the plot
 

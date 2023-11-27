@@ -12,5 +12,6 @@ dependencies:
   - joblib
   - pip
   - numba
+  - pyinstaller
   - pip:
       - sounddevice

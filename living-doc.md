@@ -70,12 +70,11 @@
   - `count_files`: Count the number of files in a given directory for naming new models appropriately.
 
 #### GUI Module
-*(TODO: Update to reflect GUI class properly after implementation.)*
 - **Classes:** `DeviceSelector`
-- **Functions:** `handle_toggle_filter`
+- **Functions:** `select_devices`
 - **Responsibilities:** 
-  - `DeviceSelector`: Allow user to choose input and output devices on program startup.
-  - `handle_toggle_filter`: Allow for the toggling of the filter on and off.
+  - `DeviceSelector`: Builds the GUI to allow users to pick audio devices on program startup.
+  - `handle_toggle_filter`: Initialize the `DeviceSelector` and return the selected devices.
 
 
 ## Coding Guidelines
@@ -233,5 +232,16 @@
         - Verifies that the function returns an appropriate response ("Folder not found.") for a non-existing folder.
 
 - **GUI Module**
-  - *(TODO: Add tests explanations here after implementation.)*
+  - **Tests:**
+    - `test_device_selector_initialization`
+      - **Purpose:** Checks correct initialization of DeviceSelector class.
+      - **Method:**
+        - Mocks `sounddevice.query_devices` to return preset device data.
+        - Validates that the `DeviceSelector` input and output device lists match expected values.
+    - `test_confirm_button`
+      - **Purpose:** Ensures correct functionality of the confirm button in DeviceSelector.
+      - **Method:**
+        - Mocks `sounddevice.query_devices`.
+        - Simulates device selection in `DeviceSelector`.
+        - Validates that input and output selections are accurately stored.
 
