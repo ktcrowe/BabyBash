@@ -39,7 +39,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Install PyTest
-      run: pip install pytest
+      run: |
+        conda activate babybashenv
+        pip install pytest
 
     - name: Run Tests
       run: |
