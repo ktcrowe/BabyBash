@@ -6,7 +6,7 @@ dependencies:
   - numpy
   - scipy
   - conda-forge::librosa
-  - conda-forge::pytorch
+  - pytorch
   - matplotlib
   - scikit-learn
   - joblib
