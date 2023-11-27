@@ -30,6 +30,12 @@ jobs:
         python-version: ${{ matrix.python-version }}
         auto-activate-base: false
 
+    - name: Activate Conda Environment and Check Setup
+      run: |
+        conda activate babybashenv
+        python --version
+        conda list
+
     - name: Install Flake8
       run: pip install flake8
 
@@ -39,13 +45,10 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
     - name: Install PyTest
-      run: |
-        conda activate babybashenv
-        pip install pytest
+      run: pip install pytest
 
     - name: Run Tests
-      run: |
-        pytest tests/
+      run: pytest tests/
 
     - name: Build Executable for macOS
       if: matrix.os == 'macOS-latest'
