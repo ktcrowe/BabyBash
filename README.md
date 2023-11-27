@@ -12,5 +12,6 @@ This project uses audio files from both the DonateACry audio corpus for positive
   - refactor: code refactoring to improve readability & encapsulation
   - gui: development of a GUI to allow for toggling of the filter and choice of audio devices
   - documentation: incorporation of Doxygen documentation into the project
+  - build: used for building the project with PyInstaller
 
 *(Note: Ownership transferred from personal to school account on 11/20/2020 due to workflow limitations.)*
