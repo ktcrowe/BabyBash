@@ -1,7 +1,13 @@
 name: BabyBash CI
 
-# This workflow is triggered on pushes and pull requests to the repository.
-on: [push, pull_request]
+# This workflow is triggered on pushes and pull requests to the main branch.
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
 
 jobs:
   build:
@@ -35,4 +41,22 @@ jobs:
 
     - name: Run Tests
       run: |
-        # pytest tests/ (TODO: uncomment this after adding test modules)
+        pytest tests/
+
+    - name: Build Executable for macOS
+      if: matrix.os == 'macOS-latest'
+      run: pyinstaller build-macos.spec
+
+    - name: Build Executable for Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: pyinstaller build-linux.spec
+
+    - name: Build Executable for Windows
+      if: matrix.os == 'windows-latest'
+      run: pyinstaller build-windows.spec
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: BabyBash-${{ matrix.os }}
+        path: dist/
