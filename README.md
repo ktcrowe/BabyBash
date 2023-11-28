@@ -18,12 +18,12 @@ This project uses audio files from both the DonateACry audio corpus for positive
 *(Note: Ownership transferred from personal to school account on 11/20/2020 due to workflow limitations.)*
 
 ## Installation
-BabyBash is currently only available on Apple Silicon machines.
+**BabyBash is currently only available on Apple Silicon machines.**
 *(Note: We have not yet tested on Linux, it may be possible to build on there. If you are successful in doing so, please contact Caitlin at `ckc5828@psu.edu`.)*
 
 ### Requirements
 - **Git** (https://git-scm.com/downloads)
-- **Recommended: BlackHole** (https://existential.audio/blackhole/)
+- ***Recommended:* BlackHole** (https://existential.audio/blackhole/)
   - This is a virtual audio driver that allows for routing of computer audio output as input. Download this if you wish to filter computer audio using BabyBash.
 
 ### 1. Download Miniconda
