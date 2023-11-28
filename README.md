@@ -1,7 +1,7 @@
 # BabyBash
 AI Audio Removal
 
-### Overview
+## Overview
 
 This is a prototype of AI driven software that aims to remove unwanted noises from input audio signals.  In this case, we aim to dampen the sound of crying babies.
 
