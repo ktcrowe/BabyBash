@@ -83,7 +83,8 @@ conda activate babybashenv
 
 ### 5. Run BabyBash
 Now you can run the program! Simply run the following command:<br>
-`python src/main.py`
+`python src/main.py`<br>
+***Please read the warning below before running BabyBash.***
 
 
 ## Usage
