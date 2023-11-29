@@ -31,8 +31,8 @@
 
 ```mermaid
 flowchart TD
-    A(main.py) --> B[GUI]
-    B -->|retrieve audio devices| C[Audio Processing]
+    A(main.py) -->|retrieve audio devices| B[GUI]
+    B -->|send audio devices| C[Audio Processing]
     C -->|send audio input| D[Audio Classification]
     D -->|retrieve<br>model/training data| E[File Management]
     D -->|send classification| C
