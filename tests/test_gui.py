@@ -3,16 +3,8 @@
 import pytest
 import tkinter as tk
 from unittest.mock import MagicMock, patch
-from gui import DeviceSelector, select_devices
+from gui import DeviceSelector
 import sounddevice as sd
-
-
-@pytest.fixture
-def mock_root():
-    """
-    Fixture to create a mock Tkinter root window.
-    """
-    return tk.Tk()
 
 
 @pytest.fixture
@@ -26,24 +18,24 @@ def mock_sd_query_devices():
     ]
 
 
-def test_device_selector_initialization(mock_root, mock_sd_query_devices):
+def test_device_selector_initialization(mock_sd_query_devices):
     """
     Test the initialization of the DeviceSelector class.
     """
     with patch('sounddevice.query_devices', return_value=mock_sd_query_devices):
-        app = DeviceSelector(mock_root)
+        app = DeviceSelector()
 
         # Assertions to verify initialization
         assert app.input_devices == ['Input Device 1'], "Input devices should be correctly identified"
         assert app.output_devices == ['Output Device 1'], "Output devices should be correctly identified"
 
 
-def test_confirm_button(mock_root, mock_sd_query_devices):
+def test_confirm_button(mock_sd_query_devices):
     """
     Test the functionality of the confirm button in DeviceSelector class.
     """
     with patch('sounddevice.query_devices', return_value=mock_sd_query_devices):
-        app = DeviceSelector(mock_root)
+        app = DeviceSelector()
 
         # Simulate user selecting devices and clicking confirm
         app.input_var.set('Input Device 1')

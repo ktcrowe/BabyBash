@@ -138,7 +138,7 @@ def compute_mfcc(indata, sample_rate, n_mfcc, n_fft, hop_length):
 
 
 # Create a low-pass filter that crying babies will be run through
-def initialize_low_pass_filter(cutoff_freq, fs, order=5):
+def initialize_low_pass_filter(cutoff_freq, sample_rate, order=5):
     """
     Initialize a low-pass filter.
 
@@ -150,7 +150,7 @@ def initialize_low_pass_filter(cutoff_freq, fs, order=5):
     Returns:
     - b, a: Numerator (b) and denominator (a) polynomials of the IIR filter.
     """
-    nyquist = 0.5 * fs
+    nyquist = 0.5 * sample_rate
     normal_cutoff = cutoff_freq / nyquist
     filter_coefs = signal.butter(order, normal_cutoff, btype='low', analog=False)
     return filter_coefs[0], filter_coefs[1]

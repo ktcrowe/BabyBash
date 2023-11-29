@@ -75,7 +75,8 @@ def main():
         # TODO: Add a GUI to select the input and output devices before starting the filter
     # input_device = 0  # Input device index (microphone / computer audio)
     # output_device = 2  # Output device index (speakers / headphones)
-    input_device, output_device = gui.select_devices()  # Prompt user for input and output devices
+    device_selector = gui.DeviceSelector()  # Initialize the GUI for selecting input and output devices
+    input_device, output_device = device_selector.select_devices()  # Prompt user for input and output devices
 
     plotter = dp.AudioDataPlotter(NUM_MFCC_COEFFS, MFCC_RANGE)  # Initialize the audio data plotter
 

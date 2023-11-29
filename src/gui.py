@@ -5,8 +5,8 @@ import sounddevice as sd
 
 # GUI for selecting input and output devices
 class DeviceSelector:
-    def __init__(self, master):
-        self.master = master
+    def __init__(self):
+        self.master = tk.Tk()
         self.master.title("BabyBash")
 
         self.input_menu = None
@@ -16,8 +16,8 @@ class DeviceSelector:
         self.input_devices = [device['name'] for device in self.device_list if device['max_input_channels'] > 0]
         self.output_devices = [device['name'] for device in self.device_list if device['max_output_channels'] > 0]
 
-        self.input_var = tk.StringVar(master)
-        self.output_var = tk.StringVar(master)
+        self.input_var = tk.StringVar(self.master)
+        self.output_var = tk.StringVar(self.master)
 
         self.create_widgets()
 
@@ -47,11 +47,7 @@ class DeviceSelector:
         print(f"Output Device: {output_device}")
         self.master.destroy()
 
-
-# Prompt the user to select input and output devices
-def select_devices():
-    root = tk.Tk()
-    app = DeviceSelector(root)
-    root.mainloop()
-
-    return app.input_var.get(), app.output_var.get()
+    # Prompt the user to select input and output devices
+    def select_devices(self):
+        self.master.mainloop()
+        return self.input_var.get(), self.output_var.get()
