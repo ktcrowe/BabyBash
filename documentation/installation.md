@@ -90,7 +90,7 @@ Now you can run the program! Simply run the following command:<br>
 
 
 ## Usage
-**WARNING: Be sure not to pick an input device that can hear your output to avoid feedback loops!**
+**WARNING: Be sure not to pick an input device that can hear your output to avoid *LOUD* feedback loops!**
 <br><br>
 
 After installing and running BabyBash, babies will be filtered out of the input audio stream, and the filtered audio will output to the selected output device. To stop filtering, simply close the program.
