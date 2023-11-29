@@ -87,8 +87,10 @@ Now you can run the program! Simply run the following command:<br>
 
 
 ## Usage
+**WARNING: Be sure not to pick an input device that can hear your output to avoid feedback loops!**
+
 After installing and running BabyBash, babies will be filtered out of the input audio stream, and the filtered audio will output to the selected output device. To stop filtering, simply close the program.
 <br><br>
-**WARNING: Be sure not to pick an input device that can hear your output to avoid feedback loops!**
+
 <br><br>
 If you wish to filter computer audio, provided you have installed BlackHole (or a similar program), set your computer's output device to BlackHole (this prevents your "clean" computer audio from being audible alongside the filtered audio). Then, set the input device in BabyBash to BlackHole (this feeds your computer output into BabyBash). You can now play audio from your computer and it will be filtered by BabyBash!
