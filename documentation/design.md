@@ -152,7 +152,6 @@
 
 ### GUI Module
 - **Classes:** `DeviceSelector`
-- **Functions:** `select_devices`
 - **Responsibilities:** 
   - `DeviceSelector`: Build the GUI to prompt users to pick audio devices on program startup.
     - **Methods:**
