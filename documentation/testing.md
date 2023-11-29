@@ -2,7 +2,7 @@
 *Testing & CI*
 
 ## Test Automation
-- **Infrastructure:** PyTest (https://docs.pytest.org/en/)
+- **Infrastructure:** [PyTest](https://docs.pytest.org/en/)
 - **Justification:** PyTest is a popular, well documented, and easy to use framework for creating automated tests in Python, which comprises 100% of this project's code. It is also compatible with GitHub Actions, which is the CI infrastructure we are using.
 - **Test Expansion:** To add new tests, simply expand upon the relevant test module within the `tests/` directory. To add a new test module, create a new file within the `tests/` directory with the name `test_<module_name>.py`. To add a new test function, create a new function within the relevant test module with the name `test_<function_name>`. To add a new test case, create a new assert statement within the relevant test function. Be sure to create relevant mock data and avoid overriding data files, such as test models and scalers, with files generated with mock data via `joblib.dump`.
 
