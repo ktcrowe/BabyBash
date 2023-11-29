@@ -219,4 +219,4 @@
 **BabyBash** will be comprehensively documented via a series of markdown files in the repository, including but not limited to:
 - **[User Guide](installation.md)**: `installation.md` - How to install, run, and use the application.
 - **[Developer Guide](dev_guidelines.md)**: `dev_guidelines.md` - How to further develop the application.
-- **[API Documentation](design.md#modules)**: *included within* `design.md` - Documentation of the application's classes and functions and how to use them.
+- **[API Documentation](design.md#modules)**: *included within `design.md`* - Documentation of the application's classes and functions and how to use them.
