@@ -50,7 +50,7 @@ The architecture of **BabyBash** comprises the following major components:
 
 ### 1. GUI
 - **Functionality:** Provides a user interface to allow user to choose audio devices.
-- **Interface:** Passes chosen devices to the audio processing component.
+- **Interface:** Passes chosen devices to the `Audio Processing` component.
 
 ### 2. Audio Processing
 - **Functionality:** Opens input and output streams, reads audio data from input and applies a filter when a baby is detected via `Audio Classification` component, then sends the filtered audio data to the output stream. Also sends input stream data to the `Data Plotting` component to be plotted in real-time, and MFCC data back to the `File Management` component when training a new model.
