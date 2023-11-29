@@ -13,15 +13,15 @@
   - [Software Components](architecture.md#software-components)
   - [Assumptions](architecture.md#assumptions)
   - [Alternative Architectures](architecture.md#alternative-architectures)
-- Design
-  - [Modules](#modules)
-  - [Coding Guidelines](#coding-guidelines)
-  - [GitHub Structure](#github-structure)
-  - [Process Description](#process-description)
-- [Testing & CI](testing.md)
-  - [Test Automation](testing.md#test-automation)
-  - [Continuous Integration](testing.md#continuous-integration)
-  - [Test Cases](testing.md#test-cases)
+- [Design](design.md)
+  - [Modules](design.md#modules)
+  - [Coding Guidelines](design.md#coding-guidelines)
+  - [GitHub Structure](design.md#github-structure)
+  - [Process Description](design.md#process-description)
+- Testing & CI
+  - [Test Automation](#test-automation)
+  - [Continuous Integration](#continuous-integration)
+  - [Test Cases](#test-cases)
 - [Developer Guidelines](dev_guidelines.md)
   - *(TODO: Complete `dev_guidelines.md`)*
 
