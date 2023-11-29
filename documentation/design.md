@@ -2,12 +2,11 @@
 *Design*
 
 
-## Table of Contents
+### Table of Contents
 - [Overview](../README.md)
-- [Installation & Usage](installation.md)
-  - [Requirements](installation.md#requirements)
-  - [Installation](installation.md#installation)
-  - [Usage](installation.md#usage)
+  - [Requirements](../README.md#requirements)
+  - [Installation](../README.md#installation)
+  - [Usage](../README.md#usage)
 - [Architecture](architecture.md)
   - [Architecture Overview](architecture.md#architecture-overview)
   - [Software Components](architecture.md#software-components)
@@ -16,6 +15,7 @@
 - Design
   - [Modules](#modules)
   - [Coding Guidelines](#coding-guidelines)
+  - [Project Structure](#project-structure)
   - [GitHub Structure](#github-structure)
   - [Process Description](#process-description)
 - [Testing & CI](testing.md)
@@ -165,7 +165,18 @@
 ### Overview
 - **Language:** Python
 - **Style Guide:** [Flake8](https://pypi.org/project/flake8/)
-- **Explanation:** *(TODO: Add explanation for this choice.)*
+- **Explanation:** *Flake8 is a wrapper for [pyflakes](https://pypi.org/project/pyflakes/) and [PEP 8](https://peps.python.org/pep-0008/) that is the current standard for Python projects.*
+
+
+## Project Structure
+  - `root/`: Contains README, Anaconda environment data, and the pytest configuration file.
+    - `.github/workflow/`: Contains the .yml file for the GitHub Actions CI.
+    - `.idea/`: Contains configuration for IntelliJ IDEA.
+    - `data/`: Contains the training data for the audio classification model.
+    - `documentation/`: Contains all documentation markdown files.
+    - `models/`: Contains the existing audio classification models and scaler.
+    - `src/`: Contains all [modules](#modules) outlined in this file (`design.md`).
+    - `tests/`: Contains all PyTest [tests](testing.md#test-cases) outlined in `testing.md`.
 
 
 ## GitHub Structure

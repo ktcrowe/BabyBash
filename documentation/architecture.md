@@ -2,12 +2,11 @@
 *Architecture*
 
 
-## Table of Contents
+### Table of Contents
 - [Overview](../README.md)
-- [Installation & Usage](installation.md)
-  - [Requirements](installation.md#requirements)
-  - [Installation](installation.md#installation)
-  - [Usage](installation.md#usage)
+  - [Requirements](../README.md#requirements)
+  - [Installation](../README.md#installation)
+  - [Usage](../README.md#usage)
 - Architecture
   - [Architecture Overview](#architecture-overview)
   - [Software Components](#software-components)
@@ -16,6 +15,7 @@
 - [Design](design.md)
   - [Modules](design.md#modules)
   - [Coding Guidelines](design.md#coding-guidelines)
+  - [Project Structure](design.md#project-structure)
   - [GitHub Structure](design.md#github-structure)
   - [Process Description](design.md#process-description)
 - [Testing & CI](testing.md)
