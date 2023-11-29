@@ -1,6 +1,31 @@
 # BabyBash
 *Testing & CI*
 
+
+## Table of Contents
+- [Overview](../README.md)
+- [Installation & Usage](installation.md)
+  - [Requirements](installation.md#requirements)
+  - [Installation](installation.md#installation)
+  - [Usage](installation.md#usage)
+- [Architecture](architecture.md)
+  - [Architecture Overview](architecture.md#architecture-overview)
+  - [Software Components](architecture.md#software-components)
+  - [Assumptions](architecture.md#assumptions)
+  - [Alternative Architectures](architecture.md#alternative-architectures)
+- Design
+  - [Modules](#modules)
+  - [Coding Guidelines](#coding-guidelines)
+  - [GitHub Structure](#github-structure)
+  - [Process Description](#process-description)
+- [Testing & CI](testing.md)
+  - [Test Automation](testing.md#test-automation)
+  - [Continuous Integration](testing.md#continuous-integration)
+  - [Test Cases](testing.md#test-cases)
+- [Developer Guidelines](dev_guidelines.md)
+  - *(TODO: Complete `dev_guidelines.md`)*
+
+
 ## Test Automation
 - **Infrastructure:** [PyTest](https://docs.pytest.org/en/)
 - **Justification:** PyTest is a popular, well documented, and easy to use framework for creating automated tests in Python, which comprises 100% of this project's code. It is also compatible with GitHub Actions, which is the CI infrastructure we are using.
