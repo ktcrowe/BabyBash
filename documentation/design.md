@@ -164,7 +164,7 @@
 
 ### Overview
 - **Language:** Python
-- **Style Guide:** Flake8 (https://pypi.org/project/flake8/)
+- **Style Guide:** [Flake8](https://pypi.org/project/flake8/)
 - **Explanation:** *(TODO: Add explanation for this choice.)*
 
 
