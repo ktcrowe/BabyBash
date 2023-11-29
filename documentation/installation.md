@@ -35,7 +35,7 @@
 
 ## Installation
 **BabyBash is currently only available on Apple Silicon machines.**<br>
-*(Note: We have not yet tested on Linux, it may be possible to build on there. If you are successful in doing so, please contact Caitlin at `ckc5828@psu.edu`.)*
+*(NOTE: We have not yet tested on Linux, it may be possible to build on there. If you are successful in doing so, please contact Caitlin at `ckc5828@psu.edu`.)*
 
 ### 1. Download Miniconda
 *(NOTE: If you already have Anaconda or Miniconda installed on your machine, you can skip this step.)*
