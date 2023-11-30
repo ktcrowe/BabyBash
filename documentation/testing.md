@@ -10,6 +10,44 @@
 - **Infrastructure:** GitHub Actions
 - **Justification:** GitHub Actions is well documented, compatible with PyTest, and available directly from GitHub, which is where our code is hosted.
 - ***(TODO: Pros/cons matrix for at least two CI services that you considered.)***
+- Pros/Cons matrix:
+
+There were two other CI services we investigated being Travis and MS Azure pipelines.
+Travis
+
+Pros:
+1.	Ease of Use: Travis CI is relatively easy to set up and configure for continuous integration workflows. Its integration with GitHub makes the setup process seamless.
+2.	GitHub Integration: It seamlessly integrates with GitHub repositories, allowing developers to trigger builds and tests automatically upon code commits or pull requests.
+3.	Diverse Language Support: Travis CI supports a wide range of programming languages and environments, making it versatile for different projects.
+4.	Free Tier: It offers a free tier for open-source projects, enabling developers to utilize continuous integration without incurring costs for these types of projects.
+5.	Build Matrix: Allows the configuration of multiple build environments simultaneously, enabling tests across various versions of dependencies or different operating systems.
+6.	Customization: It provides extensive configuration options, enabling customization of build steps, environments, and deployment procedures.
+7.	Community Support: As a widely used CI tool, it has a large and active community, providing ample resources, documentation, and support.
+Cons:
+1.	Limited Concurrency: The free tier may have limitations on concurrency and build capacity, causing potential queueing or delays in executing builds for larger projects or during high-traffic periods.
+2.	Complex Configurations: Advanced configurations might be complex, requiring a deeper understanding of its configuration language or documentation.
+3.	Limited Build Time: Free-tier builds might have a time limit, which can be restrictive for larger projects or tests requiring longer execution times.
+4.	Private Repositories Cost: While open-source projects can use Travis CI for free, private repositories require a paid subscription, which might not be cost-effective for small or individual projects.
+5.	Dependency on External Services: As it heavily relies on GitHub integration, any issues with GitHub's availability might affect Travis CI's functionality.
+
+MS Azure pipelines
+
+Pros:
+1.	Integration: Seamless integration with Azure DevOps services and other popular development tools like GitHub, Bitbucket, etc.
+2.	Flexibility: Supports multiple languages, platforms, and deployment targets (Windows, Linux, macOS).
+3.	Scalability: Scales well for projects of any size, from small teams to enterprise-level applications.
+4.	CI/CD: Comprehensive CI/CD capabilities for automating builds, testing, and deployment processes.
+5.	YAML Support: Configuration as code using YAML for defining pipelines, making it version-controlled and easily reproducible.
+6.	Extensive Marketplace: A wide range of extensions and integrations available in the Azure DevOps marketplace for additional functionality.
+7.	Security: Built-in security features and compliance with industry standards, offering secure pipelines and data protection.
+Cons:
+1.	Learning Curve: Steep learning curve for beginners, especially while setting up and configuring pipelines with YAML.
+2.	Complexity: Managing complex pipelines can become challenging, especially when dealing with multiple stages, dependencies, or conditional workflows.
+3.	Cost: Costs may escalate for large-scale usage or resource-intensive builds, as Azure Pipelines charges based on parallel jobs and usage.
+4.	Limited UI Features: The UI can sometimes lack certain advanced features available through YAML configuration.
+5.	Platform Restrictions: Although it supports multiple platforms, some functionalities might be limited or work differently across different OS environments.
+6.	Dependency on Azure Services: Heavily tied to the Azure ecosystem, which might be limiting if you prefer using other cloud services.
+
 - **Tests to run:** All test modules should be run upon each CI build.
 - **When to build:** CI builds should be run upon each push to the `main` branch, as well as upon each pull request to the `main` branch. *(TODO: Update workflow file to reflect this behavior.)*
 
