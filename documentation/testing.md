@@ -36,7 +36,7 @@
 - **Justification:** GitHub Actions is well documented, compatible with PyTest, and available directly from GitHub, which is where our code is hosted.
 - ***(TODO: Pros/cons matrix for at least two CI services that you considered.)***
 - **Tests to run:** All test modules should be run upon each CI build.
-- **When to build:** CI builds should be run upon each push to the `main` branch, as well as upon each pull request to the `main` branch. *(TODO: Update workflow file to reflect this behavior.)*
+- **When to build:** CI builds should be run upon each push to the `main` branch, as well as upon each pull request to the `main` branch.
 
 ## Test Cases
 - **Audio Classification Module**
