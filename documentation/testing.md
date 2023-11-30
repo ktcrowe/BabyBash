@@ -23,6 +23,7 @@ Pros:
 5.	Build Matrix: Allows the configuration of multiple build environments simultaneously, enabling tests across various versions of dependencies or different operating systems.
 6.	Customization: It provides extensive configuration options, enabling customization of build steps, environments, and deployment procedures.
 7.	Community Support: As a widely used CI tool, it has a large and active community, providing ample resources, documentation, and support.
+
 Cons:
 1.	Limited Concurrency: The free tier may have limitations on concurrency and build capacity, causing potential queueing or delays in executing builds for larger projects or during high-traffic periods.
 2.	Complex Configurations: Advanced configurations might be complex, requiring a deeper understanding of its configuration language or documentation.
@@ -40,6 +41,7 @@ Pros:
 5.	YAML Support: Configuration as code using YAML for defining pipelines, making it version-controlled and easily reproducible.
 6.	Extensive Marketplace: A wide range of extensions and integrations available in the Azure DevOps marketplace for additional functionality.
 7.	Security: Built-in security features and compliance with industry standards, offering secure pipelines and data protection.
+
 Cons:
 1.	Learning Curve: Steep learning curve for beginners, especially while setting up and configuring pipelines with YAML.
 2.	Complexity: Managing complex pipelines can become challenging, especially when dealing with multiple stages, dependencies, or conditional workflows.
