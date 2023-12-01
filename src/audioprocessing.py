@@ -36,7 +36,7 @@ class AudioProcessor:
         self.threshold_length = 50  # Number of blocks to check for a baby in the buffer
         self.threshold = 5  # Number of blocks with a baby in the threshold to trigger filtering
 
-        self.lp_filter_b, self.lp_filter_a = initialize_low_pass_filter(cutoff_freq=1000, fs=self.sample_rate)
+        self.lp_filter_b, self.lp_filter_a = initialize_low_pass_filter(cutoff_freq=1000, sample_rate=self.sample_rate)
         self.filter_state = signal.lfilter_zi(self.lp_filter_b, self.lp_filter_a)
 
     # Function called by the audio stream when new data is available
