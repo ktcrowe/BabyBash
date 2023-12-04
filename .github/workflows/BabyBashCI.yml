@@ -1,45 +1,87 @@
 name: BabyBash CI
 
-# This workflow is triggered on pushes and pull requests to the main branch.
 on:
   push:
     branches:
-      - main
+      - testing
   pull_request:
     branches:
-      - main
+      - testing
 
 jobs:
-  build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macOS-latest]
-        python-version: ['3.11.5']
+  build-macos:
+    runs-on: macOS-latest #<-chnage this!CAIT!
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
-    # Look into caching conda environments to speed up CI
-    - name: Setup Conda Environment
-      uses: conda-incubator/setup-miniconda@v2
+    - name: Set up Python 3.11.5
+      uses: actions/setup-python@v3
       with:
-        activate-environment: babybashenv
-        environment-file: environment.yml
-        python-version: ${{ matrix.python-version }}
-        auto-activate-base: false
+        python-version: '3.11.5'
 
-    - name: Install Flake8
-      run: pip install flake8
-
-    - name: Lint with Flake8
+    - name: Add conda to system path
       run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+
+    - name: Install dependencies
+      run: |
+        conda env update --file environment.yml --name base
+
+    - name: Lint with flake8
+      run: |
+        conda install flake8
+        # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-    - name: Install PyTest
-      run: pip install pytest
-
-    - name: Run Tests
+    - name: Test with pytest
       run: |
-        # pytest tests/  (TODO: Re-enable at a later date after fixing CI. Run tests locally for now.)
+        conda install pytest
+        pytest
+
+## This workflow is triggered on pushes and pull requests to the main branch.
+#on:
+#  push:
+#    branches:
+#      - main
+#  pull_request:
+#    branches:
+#      - main
+#
+#jobs:
+#  build:
+#    runs-on: ${{ matrix.os }}
+#    strategy:
+#      matrix:
+#        os: [macOS-latest]
+#        python-version: ['3.11.5']
+#
+#    steps:
+#    - uses: actions/checkout@v2
+#
+#    # Look into caching conda environments to speed up CI
+#    - name: Setup Conda Environment
+#      uses: conda-incubator/setup-miniconda@v2
+#      with:
+#        activate-environment: babybashenv
+#        environment-file: environment.yml
+#        python-version: ${{ matrix.python-version }}
+#        auto-activate-base: false
+#
+#    - name: Install Flake8
+#      run: pip install flake8
+#
+#    - name: Lint with Flake8
+#      run: |
+#        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+#        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+#
+#    - name: Install PyTest
+#      run: pip install pytest
+#
+#    - name: Run Tests
+#      run: |
+#        # pytest tests/  (TODO: Re-enable at a later date after fixing CI. Run tests locally for now.)
