@@ -42,6 +42,7 @@ jobs:
         conda install pytest
         pytest
 
+
 ## This workflow is triggered on pushes and pull requests to the main branch.
 #on:
 #  push:
