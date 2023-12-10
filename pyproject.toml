@@ -1,0 +1,25 @@
+[tool.poetry]
+name = "babybash"
+version = "0.1.0"
+description = ""
+authors = ["ktcrowe <caitlin55565@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">3.10"
+numpy = "^1.26.2"
+scipy = "^1.11.4"
+matplotlib = "^3.8.2"
+scikit-learn = "^1.3.2"
+joblib = "^1.3.2"
+pip = "^23.3.1"
+numba = "^0.58.1"
+librosa = "^0.10.1"
+sounddevice = "^0.4.6"
+torch = "^2.1.1"
+flake8 = "^6.1.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

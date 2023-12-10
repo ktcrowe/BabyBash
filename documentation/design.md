@@ -175,7 +175,7 @@
     - `data/`: Contains the training data for the audio classification model.
     - `documentation/`: Contains all documentation markdown files.
     - `models/`: Contains the existing audio classification models and scaler.
-    - `src/`: Contains all [modules](#modules) outlined in this file (`design.md`).
+    - `babybash/`: Contains all [modules](#modules) outlined in this file (`design.md`).
     - `tests/`: Contains all PyTest [tests](testing.md#test-cases) outlined in `testing.md`.
 
 

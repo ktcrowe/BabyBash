@@ -85,8 +85,3 @@ def main():
                         input_device, output_device, verbose=VERBOSE)
 
     ap.open_streams()  # Open the input audio stream and start processing audio
-
-
-# Run the program
-if __name__ == '__main__':
-    main()
