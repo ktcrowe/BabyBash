@@ -13,6 +13,7 @@ This prototype's training data consists of audio files from both the [DonateACry
 ## Requirements
 - **Apple Silicon machine**
 - **[Git](https://git-scm.com/downloads)**
+- **[Poetry](https://python-poetry.org/docs/#installation)**
 - ***Recommended:* [BlackHole](https://existential.audio/blackhole/)**
   - This is a virtual audio driver that allows for routing of computer audio output as input. Download this if you wish to filter computer audio using BabyBash.
 
@@ -20,29 +21,18 @@ This prototype's training data consists of audio files from both the [DonateACry
 ## Installation
 **BabyBash is currently only available on Apple Silicon machines.**<br>
 
-### 1. Download Miniconda
-*(NOTE: If you already have Anaconda or Miniconda installed on your machine, you can skip this step.)*
-<br><br>
-Run the following commands in your terminal to download Miniconda:
+### 1. Download Poetry
+Run the following command in your terminal to download Poetry:
 ```
-mkdir -p ~/miniconda3
-curl https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-arm64.sh -o ~/miniconda3/miniconda.sh
-bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-rm -rf ~/miniconda3/miniconda.sh
+pip install poetry
 ```
 
-After installing, be sure to initialize Miniconda with the following commands:
-```
-~/miniconda3/bin/conda init bash
-~/miniconda3/bin/conda init zsh
-```
-
-### 2. Verify Git and Miniconda Installations
+### 2. Verify Git and Poetry Installations
 Run the following command in your terminal to ensure Git is installed:<br>
 `git --version`
 <br><br>
-Similarly, run the following command to ensure Miniconda is installed:<br>
-`conda --version`
+Similarly, run the following command to ensure Poetry is installed:<br>
+`poetry --version`
 <br><br>
 If both of these commands return a version number, you are good to go!
 
@@ -57,26 +47,24 @@ Next, clone the repository to this folder:<br>
 After cloning the repository, navigate into the BabyBash directory:<br>
 `cd BabyBash`
 
-### 4. Create the Conda Environment
-Run the following commands to create and activate the Conda environment:<br>
+### 4. Create the Poetry Environment
+Run the following commands to create and activate the Poetry environment:<br>
 ```
-conda env create -f environment.yml
-conda activate babybashenv
+poetry install
+poetry shell
 ```
 
 ### 5. Run BabyBash
 Now you can run the program! Simply run the following command:<br>
 ***(NOTE: Please read the warning below before running BabyBash.)***<br>
-`python src/main.py`
+`python babybash`
 
 
 ## Usage
 **WARNING: Be sure not to pick an input device that can hear your output to avoid *LOUD* feedback loops!**
 <br><br>
-
 After installing and running BabyBash, babies will be filtered out of the input audio stream, and the filtered audio will output to the selected output device. To stop filtering, simply close the program.
 <br><br>
-
 If you wish to filter computer audio, provided you have installed BlackHole (or a similar program), set your computer's output device to BlackHole (this prevents your "clean" computer audio from being audible alongside the filtered audio). Then, set the input device in BabyBash to BlackHole (this feeds your computer output into BabyBash). You can now play audio from your computer and it will be filtered by BabyBash!
 
 
