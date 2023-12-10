@@ -3,10 +3,10 @@ name: BabyBash CI
 on:
   push:
     branches:
-      - testing
+      - main
   pull_request:
     branches:
-      - testing
+      - main
 
 jobs:
   build:
