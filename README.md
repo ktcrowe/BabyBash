@@ -46,7 +46,7 @@ Next, clone the repository to this folder:<br>
 <br><br>
 After cloning the repository, navigate into the BabyBash directory:<br>
 `cd BabyBash`<br><br>
-*(NOTE: You can safely delete the **data** directory in the cloned repository to save disk space if you do not plan on training new models.)*
+*(Note: You can safely delete the `data` directory in the cloned repository to save disk space if you do not plan on training new models.)*
 
 ### 4. Create the Poetry Environment
 Run the following commands to create and activate the Poetry environment:<br>
@@ -55,7 +55,7 @@ Run the following commands to create and activate the Poetry environment:<br>
 
 ### 5. Run BabyBash
 Now you can run the program! Simply run the following command:<br>
-***(NOTE: Please read the warning below before running BabyBash.)***<br>
+***(Note: Please read the warning below before running BabyBash.)***<br>
 `python babybash`
 
 
