@@ -192,7 +192,7 @@
 ## Process Description
 
 ### Risk Assessment
-- **Risk (Cait):** Separation of baby crying from other sounds is too complex to be achieved in real-time.
+- **Risk:** Separation of baby crying from other sounds is too complex to be achieved in real-time.
   - **Likelihood:** High
   - **Impact:** High
   - **Evidence:** Since Deezer's "spleeter" library is not available to us, we would have to implement our own second NN using something akin to U-Net architecture. This would be a very complex task that is likely to not be feasible in the time we have.
@@ -200,17 +200,13 @@
   - **Detection:** Audio can not be separated in real-time, or at all.
   - **Mitigation:** Apply a simple filter to the audio signal to muffle the sound of the baby crying.
 
-- **Risk (Cait):** Detection of baby crying is not accurate enough to provide full coverage without false positives.
+- **Risk:** Detection of baby crying is not accurate enough to provide full coverage without false positives.
   - **Likelihood:** High
   - **Impact:** High
   - **Evidence:** The model is trained on a small dataset of only 1000 samples. This is not enough to provide full coverage of all possible baby crying sounds. The real-time nature of the application means that detections will be less accurate.
   - **Reduction:** Experimented with different approaches to the problem of audio classification, such as CNN architecture. This was not feasible given time constraints and lack of time axis in real-time audio data. Experimented with audio file length normalization and different amounts of MFCC coefficients to no avail.
   - **Detection:** The model is not able to detect baby crying in some cases. In other cases, the model detects baby crying when there is none.
   - **Mitigation:** Make use of fades and audio buffers to increase the window of audio filtering (filling in the blanks so to speak). Implement a threshold in the buffer to reduce false-positive filtering. Include more training data in the model.
-
-- **(TODO: Israel's Risk)**
-- **(TODO: Gwen's Risk)**
-- **(TODO: Richard's Risk)**
 
 ### Project Schedule
 - **Milestones:** Prototype completion, Alpha release, Beta release, Final release
@@ -220,10 +216,8 @@
   - **Final release *(Spring 2023 - not within scope of 487W):*** Fully optimized model and real-time performance.
 
 ### Team Structure
-- **Caitlin Crowe:** Project manager & lead developer
-- **(TODO: Israel's role)**
-- **(TODO: Gwen's role)**
-- **(TODO: Richard's role)**
+- **Caitlin Crowe:** Project management & lead development
+- **Bryan Naroditskiy:** Research assistance, data collection, and development
 
 ### Documentation Plan
 **BabyBash** will be comprehensively documented via a series of markdown files in the repository, including but not limited to:
