@@ -212,8 +212,8 @@
 - **Milestones:** Prototype completion, Alpha release, Beta release, Final release
   - **Prototype completion *(REACHED 11/24/23):*** Basic functionality of the application is implemented. The audio processing module is able to capture input audio and output filtered audio. The audio classification module is able to classify audio data as either baby crying or not baby crying. The data plotting module is able to plot input audio data in real-time. The file management module is able to load data from files. The GUI module is able to allow the user to choose input and output devices and toggle the filter. Full test coverage is provided.
   - **Alpha release *(REACHED 11/27/23):*** Partial documentation. The application is able to run via terminal across all systems specified in the CI. CI may be incomplete, bugs may be present, model might require optimization, baby removal via simple low-pass filtering.
-  - **Beta release *(Spring 2023 - not within scope of 487W):*** Full documentation & Linux support. True removal of crying babies from input signal. Signal delay may be present.
-  - **Final release *(Spring 2023 - not within scope of 487W):*** Fully optimized model and real-time performance.
+  - **Beta release *(Spring 2024):*** Full documentation & true removal of unwanted noise from input signal. Signal delay may be present. Pivoting away from crying babies to simpler noises.
+  - **Final release *(2024):*** Fully optimized model and real-time performance.
 
 ### Team Structure
 - **Caitlin Crowe:** Project management & lead development
