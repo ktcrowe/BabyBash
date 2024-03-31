@@ -61,7 +61,7 @@ class AudioClassifier(nn.Module):
         # Normalize features (MFCCs) with a scaler
         self.scaler = StandardScaler()
         features = self.scaler.fit_transform(features)
-        dump(self.scaler, 'models/scaler.joblib') if save_scaler else None  # save scaler if specified
+        dump(self.scaler, '../models/scaler.joblib') if save_scaler else None  # save scaler if specified
         # TODO: Allow for multiple scalers to be saved (one for each model)
 
         """

@@ -4,6 +4,7 @@ import os
 import librosa  # For audio feature extraction
 
 from audioprocessing import normalize_audio_length  # Tools for audio processing
+from pydub import AudioSegment  # For converting M4A to WAV format
 
 
 # load files from a given folder and return the features (MFCCs) and labels (normalizing audio length if specified)
@@ -36,3 +37,18 @@ def count_files_in_folder(folder_path):
             file_count += 1
 
     return file_count
+
+
+# Convert M4A to WAV format
+def m4a_to_wav():
+    for filename in os.listdir('../data/positive'):
+        if filename.endswith('.m4a'):
+            sound = AudioSegment.from_file(f'../data/positive/{filename}', format='m4a')
+            file_handle = sound.export(f'../data/positive/{filename[:-4]}.wav', format='wav')
+            os.remove(f'../data/positive/{filename}')
+    for filename in os.listdir('../data/negative'):
+        if filename.endswith('.m4a'):
+            sound = AudioSegment.from_file(f'../data/negative/{filename}', format='m4a')
+            file_handle = sound.export(f'../data/negative/{filename[:-4]}.wav', format='wav')
+            os.remove(f'../data/negative/{filename}')
+

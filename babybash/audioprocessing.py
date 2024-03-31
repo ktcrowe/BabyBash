@@ -37,6 +37,7 @@ class AudioProcessor:
         self.threshold = 5  # Number of blocks with a baby in the threshold to trigger filtering
 
         self.lp_filter_b, self.lp_filter_a = initialize_low_pass_filter(cutoff_freq=1000, sample_rate=self.sample_rate)
+        # self.lp_filter_b, self.lp_filter_a = initialize_notch_filter(notch_freq=615, quality_factor=30, sample_rate=self.sample_rate)
         self.filter_state = signal.lfilter_zi(self.lp_filter_b, self.lp_filter_a)
 
     # Function called by the audio stream when new data is available
@@ -154,6 +155,25 @@ def initialize_low_pass_filter(cutoff_freq, sample_rate, order=5):
     normal_cutoff = cutoff_freq / nyquist
     filter_coefs = signal.butter(order, normal_cutoff, btype='low', analog=False)
     return filter_coefs[0], filter_coefs[1]
+
+
+# Initialize a notch filter to remove a specific frequency
+def initialize_notch_filter(notch_freq, quality_factor, sample_rate):
+    """
+    Initialize a notch filter.
+
+    Parameters:
+    - notch_freq: Center frequency to be notched out (in Hz).
+    - quality_factor: Quality factor of the notch filter. Determines the width of the notch band.
+                      Higher values mean a narrower notch.
+    - sample_rate: Sampling rate (in Hz).
+
+    Returns:
+    - b, a: Numerator (b) and denominator (a) polynomials of the IIR filter.
+    """
+    w0 = notch_freq / (0.5 * sample_rate)
+    b, a = signal.iirnotch(w0, quality_factor, sample_rate)
+    return b, a
 
 
 # normalize audio files to a target length in seconds

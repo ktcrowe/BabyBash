@@ -2,6 +2,7 @@
 import os
 import sys
 
+import filemanagement
 import gui
 import audioclassification as ac  # Neural network for audio classification
 import dataplotting as dp  # Tools for plotting and visualization of audio data
@@ -15,12 +16,12 @@ NUM_MFCC_COEFFS = 26  # Number of Mel-frequency cepstral coefficients (MFCCs) to
 MFCC_RANGE = 10  # Range of values for the y-axis on the plot (initially was 275, but reduced to reflect normalized MFCCs)
 N_FFT = BLOCK_SIZE  # Fast Fourier Transform (FFT) window size set to block size
 HOP_LENGTH = N_FFT // 4  # Hop length for the FFT, typically 1/4th of the FFT window size
-AUDIO_FILE_LENGTH = 7  # Length of audio files in seconds (used for normalizing audio length)
+AUDIO_FILE_LENGTH = 5  # Length of audio files in seconds (used for normalizing audio length)
 
 # Define paths
-CRYING_PATH = 'data/crying'  # audio files of crying babies
-NOISE_PATH = 'data/noise'  # audio files of various other noises (not babies crying)
-MODEL_TO_USE = 'model_v1.pth'  # the model to use for detecting crying babies (if USE_SPECIFIC_MODEL is True)
+POSITIVE_PATH = '../data/positive'  # audio files of positive audio samples
+NEGATIVE_PATH = '../data/negative'  # audio files of negative audio samples
+MODEL_TO_USE = 'model_v4.pth'  # the model to use for detecting crying babies (if USE_SPECIFIC_MODEL is True)
 """
 The current models are as follows:
     - model_v1.pth: No file length normalization results are somewhere between v2 and v3 (this is the model used in alpha build)
@@ -31,7 +32,7 @@ The current models are as follows:
 # Define flags
 RETRAIN = False  # make this true when you wish to generate a new model
 USE_SPECIFIC_MODEL = True  # make this true when you wish to load a specific model (MODEL_TO_USE) - exclusive with RETRAIN
-NORMALIZE_AUDIO_LENGTH = False  # make this true when you wish to normalize the length of audio files (AUDIO_FILE_LENGTH)
+NORMALIZE_AUDIO_LENGTH = True  # make this true when you wish to normalize the length of audio files (AUDIO_FILE_LENGTH)
 VERBOSE = False  # make this true when you wish to display additional information in the console when running the program
 
 # Determine if the application is running as a PyInstaller bundle
@@ -44,27 +45,27 @@ else:
 
 MODELS_PATH = os.path.join(application_path, 'models')  # path to the folder containing the models
 
-
 # Entry point for the program
 def main():
     baby_detector = ac.AudioClassifier(NUM_MFCC_COEFFS, MODELS_PATH)  # Initialize the neural network for audio classification
 
     # Create or load a model for the audio classifier
     if RETRAIN:  # This runs when a new model is to be generated
+        # filemanagement.m4a_to_wav()  # Convert M4A files to WAV format
 
         # Prepare training data
         if NORMALIZE_AUDIO_LENGTH:  # normalize audio length if specified
             # Load baby crying sounds & label them 1
-            crying_features, crying_labels = load_data(CRYING_PATH, 1,
+            crying_features, crying_labels = load_data(POSITIVE_PATH, 1,
                                                        SAMPLE_RATE, NUM_MFCC_COEFFS,
                                                        normalize_to_length=AUDIO_FILE_LENGTH)
             # Load other noise & label them 0
-            noise_features, noise_labels = load_data(NOISE_PATH, 0,
+            noise_features, noise_labels = load_data(NEGATIVE_PATH, 0,
                                                      SAMPLE_RATE, NUM_MFCC_COEFFS,
                                                      normalize_to_length=AUDIO_FILE_LENGTH)
         else:  # no audio length normalization
-            crying_features, crying_labels = load_data(CRYING_PATH, 1, SAMPLE_RATE, NUM_MFCC_COEFFS)  # Load baby crying sounds & label them 1
-            noise_features, noise_labels = load_data(NOISE_PATH, 0, SAMPLE_RATE, NUM_MFCC_COEFFS)  # Load other noise & label them 0
+            crying_features, crying_labels = load_data(POSITIVE_PATH, 1, SAMPLE_RATE, NUM_MFCC_COEFFS)  # Load baby crying sounds & label them 1
+            noise_features, noise_labels = load_data(NEGATIVE_PATH, 0, SAMPLE_RATE, NUM_MFCC_COEFFS)  # Load other noise & label them 0
 
         baby_detector.new_model(crying_features, noise_features, crying_labels, noise_labels, verbose=VERBOSE)  # Train the model
 
